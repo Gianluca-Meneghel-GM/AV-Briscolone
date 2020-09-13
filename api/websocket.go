@@ -50,9 +50,9 @@ func ascolta(conn *websocket.Conn) {
 		case "giocaCarta":
 			giocaCartaHandler(messaggio)
 		case "giocaCartaBot":
-			giocaCartaBotHandler()
+			giocaCartaBotHandler(messaggio)
 		case "iniziaNuovaMano":
-			broadcast(getGiocata())
+			iniziaManoHandler()
 		case "altroRound":
 			altroRoundHandler(messaggio)
 		case "altroRoundBot":
@@ -105,6 +105,6 @@ func scriviA(id int, messaggio interface{}) {
 
 func broadcast(messaggio interface{}) {
 	for i := range connessioni {
-		go scriviA(i, messaggio)
+		scriviA(i, messaggio)
 	}
 }

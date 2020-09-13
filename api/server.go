@@ -45,36 +45,11 @@ func (s Server) SetupRoutes() {
 	})
 
 	partitaRouter := s.router.PathPrefix("/partita").Subrouter()
-	partitaRouter.Path("/start/{id}").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		TryStartPartitaHandler(w, r, s.adapter)
-	})
+
 	partitaRouter.Path("/end").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		FinisciPartitaHandler(w, r, s.adapter)
 	})
-	partitaRouter.Path("/chiamabili").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		GetChiamabiliHandler(w, r, s.adapter)
-	})
-	partitaRouter.Path("/finechiamata").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		GetFineChiamataHandler(w, r, s.adapter)
-	})
-	partitaRouter.Path("/giocata").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		GetGiocataHandler(w, r, s.adapter)
-	})
-	partitaRouter.Path("/gioca/{id}/seme/{sem}/valore/{val}").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		GiocaCartaHandler(w, r, s.adapter)
-	})
-	partitaRouter.Path("/giocabot/{id}").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		GiocaCartaBotHandler(w, r, s.adapter)
-	})
-	partitaRouter.Path("/chiamabot/{id}").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ChiamaCartaBotHandler(w, r, s.adapter)
-	})
-	partitaRouter.Path("/chiama/{id}/carta/{valore}").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ChiamaCartaHandler(w, r, s.adapter)
-	})
-	partitaRouter.Path("/chiama/seme/{seme}").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ChiamaSemeHandler(w, r, s.adapter)
-	})
+
 	partitaRouter.Path("/mostravittoria").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		MostraVittoriaHandler(w, r, s.adapter)
 	})

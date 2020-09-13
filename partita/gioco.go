@@ -35,10 +35,6 @@ func SetLastCartaGiocata(semeStr string, val int) {
 	lastCartaGiocata = models.Carta{Valore: val, Seme: seme[0], SemeStr: semeStr}
 }
 
-func GetLastCartaGiocata() models.Carta {
-	return lastCartaGiocata
-}
-
 func CarteGiocate() map[int]models.Carta {
 	return carteGiocate
 }

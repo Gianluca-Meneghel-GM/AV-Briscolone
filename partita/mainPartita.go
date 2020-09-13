@@ -35,6 +35,7 @@ func GetGiocatoriPronti() map[int]bool{
 
 func SetGiocatorePronto(id int) {
 	giocatoriPronti[id] = true
+	log.Println("è pronto " + strconv.Itoa(id))
 }
 
 func FaiIlMazzo() {
@@ -48,12 +49,12 @@ func daiCarte() {
 	for i, c := range mazzo {
 		idx := i / 8
 		c.SemeStr = string(c.Seme)
-		mano[idx] = append(ordina(mano[idx]), c)
+		mano[idx] = append(mano[idx], c)
 	}
 }
 
 func GetCarte(id int) []models.Carta {
-	return mano[id]
+	return ordina(mano[id])
 }
 
 func ordina(data []models.Carta) []models.Carta {
@@ -130,6 +131,15 @@ func GiocatoriIscritti() int {
 	return numIscritti
 }
 
+func GetGiocatori() *[]models.Giocatore {
+	gioc, err := db.GetGiocatori()
+	if err != nil{
+		log.Println("Errore prendendo giocatori: " + err.Error())
+		return nil
+	}
+	return gioc
+}
+
 func IniziaPartita() *[]models.CurrentGiocatore {
 	ResetMano()
 	FaiIlMazzo()
@@ -163,5 +173,5 @@ func ResetRound() {
 }
 
 func SalvaRecordPartita() {
-	db.GetCurrentGiocatori()
+	db.SalvaRecordPartita()
 }

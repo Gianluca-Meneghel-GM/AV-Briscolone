@@ -25,11 +25,12 @@ type IniziaPartitaResp struct {
 }
 
 type setChiamabiliResp struct {
-	Azione      string
-	Chiamabili  []int
-	ToccaA      int
-	Chiamante   int
-	ValChiamato int
+	Azione        string
+	Chiamabili    []int
+	ToccaA        int
+	Chiamante     int
+	ValChiamato   int
+	PuntiVittoria int
 }
 
 type setGiocataResp struct {
@@ -39,6 +40,11 @@ type setGiocataResp struct {
 	Mano         int
 	CarteGiocate map[int]models.Carta
 	ToccaA       int
+}
+
+type setFinePartitaResp struct {
+	Azione    string
+	Giocatori []models.Giocatore
 }
 
 type iniziaRoundResp struct {
