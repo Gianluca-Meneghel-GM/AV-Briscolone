@@ -1,0 +1,9 @@
+---
+# informazioni sul mazzo
+:name: Carte Francesi
+:key: francesi
+:num_carte: 52
+:color_trasp: 
+- 255
+- 255
+- 255

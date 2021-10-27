@@ -1,0 +1,10 @@
+---
+# informazioni sul mazzo
+:name: Carte milanesi
+:num_carte: 40
+:key: milano
+:color_trasp: 
+- 0
+- 128
+- 0
+
