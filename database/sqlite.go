@@ -1,7 +1,8 @@
 package database
 
 import (
-	"../models"
+	"briscolone/models"
+
 	"github.com/jmoiron/sqlx"
 )
 
@@ -35,8 +36,8 @@ func (s SqliteItemsAdapter) AddGiocatore(nome string) error {
 	return models.AddGiocatore(s.db, nome)
 }
 
-func (s SqliteItemsAdapter) SalvaRecordPartita() {
-	models.SalvaRecordPartita(s.db)
+func (s SqliteItemsAdapter) SalvaRecordPartita(contoRound int) {
+	models.SalvaRecordPartita(s.db, contoRound)
 }
 
 func (s SqliteItemsAdapter) SelectGiocatore(nome string, isBot int) (int, error) {
@@ -50,4 +51,3 @@ func (s SqliteItemsAdapter) AssegnaPuntiVittoria(puntivittoria []int) error {
 func (s SqliteItemsAdapter) GetPuntiPartita(puntivittoria []int) error {
 	return models.AssegnaPuntiVittoria(s.db, puntivittoria)
 }
-

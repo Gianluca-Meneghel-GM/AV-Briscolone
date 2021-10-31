@@ -5,7 +5,7 @@
             clipped-right
             color="#718F94"
     >
-      <v-toolbar-title>{{header}}</v-toolbar-title>
+      <v-toolbar-title><div style="color: #ffffff">{{header}}</div></v-toolbar-title>
       <v-spacer></v-spacer>
       <div class="text-center">
         <v-menu offset-y class="ma-3">
@@ -53,7 +53,7 @@
     }),
     computed: {
       header () {
-        return this.$store.state.giocatore.nome ? this.$store.state.giocatore.nome + ' - Giocatore ' + this.$store.state.giocatore.id : 'Salve'
+        return this.$store.state.giocatore.nome ? this.$store.state.giocatore.nome + ' (Giocatore ' + this.$store.state.giocatore.id + ')' : 'Salve'
       }
     },
     methods: {

@@ -1,7 +1,7 @@
 package partita
 
 import (
-	"../models"
+	"briscolone/models"
 	"math/rand"
 	"strconv"
 	"time"
@@ -15,7 +15,7 @@ var briscolaTemp string
 var puntiChiamante int
 var puntiAltri int
 var maniGiocate = 0
-var puntiVittoria = 61
+var puntiPerVittoria = 61
 var haFinito = []bool{false, false, false, false, false}
 
 func GetCartePrese() []int {
@@ -132,35 +132,46 @@ func finisciRound() error {
 
 func getPuntiVittoria() []int {
 	puntigiocatore := []int{0, 0, 0, 0, 0}
+	moltiplicatore := 1
+	if puntiPerVittoria > 70 {
+		moltiplicatore = 2
+	} else if puntiPerVittoria > 80 {
+		moltiplicatore = 3
+	}
+	if puntiChiamante == 120 {
+		moltiplicatore *= 2
+	}
 	for g := range puntigiocatore {
+		var pti int
 		if g == chiamante {
-			if puntiChiamante >= puntiVittoria {
-				puntigiocatore[g] += 2
+			if puntiChiamante >= puntiPerVittoria {
+				pti = 2
 			} else {
-				puntigiocatore[g] -= 2
+				pti = -2
 			}
 		} else if g == socio {
-			if puntiChiamante >= puntiVittoria {
-				puntigiocatore[g]++
+			if puntiChiamante >= puntiPerVittoria {
+				pti = 1
 			} else {
-				puntigiocatore[g]--
+				pti = -1
 			}
 		} else {
-			if puntiChiamante < puntiVittoria {
-				puntigiocatore[g]++
+			if puntiChiamante < puntiPerVittoria {
+				pti = 1
 			} else {
-				puntigiocatore[g]--
+				pti = -1
 			}
 		}
+		puntigiocatore[g] += pti * moltiplicatore
 	}
 	return puntigiocatore
 }
 
 func GetVittoria() models.Vittoria {
 	vincitori := []int{}
-	puntiPartita := []int{0,0,0,0,0}
+	puntiPartita := []int{0, 0, 0, 0, 0}
 	puntiVincitori := 0
-	if puntiChiamante >= puntiVittoria {
+	if puntiChiamante >= puntiPerVittoria {
 		vincitori = []int{chiamante, socio}
 		puntiVincitori = puntiChiamante
 	} else {
@@ -172,7 +183,7 @@ func GetVittoria() models.Vittoria {
 		}
 	}
 	giocatori, _ := db.GetCurrentGiocatori()
-	for _,g := range *giocatori {
+	for _, g := range *giocatori {
 		puntiPartita[g.Id] = g.Punti
 	}
 	return models.Vittoria{Vincitori: vincitori, PuntiVincitori: puntiVincitori, PuntiPartita: puntiPartita}
@@ -181,7 +192,7 @@ func GetVittoria() models.Vittoria {
 func TryFineRound(giocatore int) bool {
 	haFinito[giocatore] = true
 	isLaFine := true
-	for _,g := range haFinito {
+	for _, g := range haFinito {
 		if !g {
 			isLaFine = false
 			break

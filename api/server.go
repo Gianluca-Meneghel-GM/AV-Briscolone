@@ -1,13 +1,14 @@
 package api
 
 import (
-	"../database"
+	"briscolone/database"
 	"fmt"
+	"io"
+	"net/http"
+
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
-	"io"
-	"net/http"
 )
 
 type Server struct {
@@ -56,7 +57,6 @@ func (s Server) SetupRoutes() {
 	partitaRouter.Path("/fineround/{id}").Methods(http.MethodGet).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		GetFineRoundHandler(w, r, s.adapter)
 	})
-
 
 	s.router.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		tpl, err1 := route.GetPathTemplate()

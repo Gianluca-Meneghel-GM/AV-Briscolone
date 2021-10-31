@@ -1,8 +1,8 @@
 package partita
 
 import (
-	"../database"
-	"../models"
+	"briscolone/database"
+	"briscolone/models"
 	"log"
 	"math/rand"
 	"strconv"
@@ -12,9 +12,10 @@ import (
 var db *database.SqliteItemsAdapter
 var mazzo []models.Carta
 var mano = [][]models.Carta{{}, {}, {}, {}, {}}
-var giocatoriPronti = map[int]bool{0:false, 1: false, 2: false, 3: false, 4: false}
+var giocatoriPronti = map[int]bool{0: false, 1: false, 2: false, 3: false, 4: false}
 var chiInizia = 0
 var aChiTocca int
+var contoRound = 0
 
 func Init(database *database.SqliteItemsAdapter) {
 	db = database
@@ -29,7 +30,7 @@ func IscriviBot(id int) {
 	}
 }
 
-func GetGiocatoriPronti() map[int]bool{
+func GetGiocatoriPronti() map[int]bool {
 	return giocatoriPronti
 }
 
@@ -78,7 +79,7 @@ func merge(left, right []models.Carta) []models.Carta {
 				result[i] = right[0]
 				right = right[1:]
 			} else {
-				if left[0].Valore < right[0].Valore {
+				if left[0].Valore > right[0].Valore {
 					result[i] = left[0]
 					left = left[1:]
 				} else {
@@ -133,7 +134,7 @@ func GiocatoriIscritti() int {
 
 func GetGiocatori() *[]models.Giocatore {
 	gioc, err := db.GetGiocatori()
-	if err != nil{
+	if err != nil {
 		log.Println("Errore prendendo giocatori: " + err.Error())
 		return nil
 	}
@@ -143,12 +144,17 @@ func GetGiocatori() *[]models.Giocatore {
 func IniziaPartita() *[]models.CurrentGiocatore {
 	ResetMano()
 	FaiIlMazzo()
+	contoRound++
 	giocatori, err := db.GetCurrentGiocatori()
 	if err != nil {
 		log.Println("errore leggendo giocatori: " + err.Error())
 		return nil
 	}
 	return giocatori
+}
+
+func ResetContoRound() {
+	contoRound = 0
 }
 
 func ResetRound() {
@@ -163,8 +169,8 @@ func ResetRound() {
 	puntiAltri = 0
 	cartePrese = []int{0, 0, 0, 0, 0}
 	maniGiocate = 0
-	puntiVittoria = 61
-	giocatoriPronti = map[int]bool{0:false, 1: false, 2: false, 3: false, 4: false}
+	puntiPerVittoria = 61
+	giocatoriPronti = map[int]bool{0: false, 1: false, 2: false, 3: false, 4: false}
 	haFinito = []bool{false, false, false, false, false}
 	for i := range mano {
 		mano[i] = []models.Carta{}
@@ -173,5 +179,5 @@ func ResetRound() {
 }
 
 func SalvaRecordPartita() {
-	db.SalvaRecordPartita()
+	db.SalvaRecordPartita(contoRound)
 }

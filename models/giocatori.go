@@ -1,15 +1,17 @@
 package models
 
 import (
-	"../store"
+	"briscolone/store"
+	"log"
+
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-	"log"
 )
 
 type Giocatore struct {
 	Nome     string `db:"nome"`
 	Vittorie int    `db:"vittorie"`
+	Round    int    `db:"round"`
 	Partite  int    `db:"partite"`
 	PuntiTot int    `db:"puntitotali"`
 }
@@ -34,7 +36,7 @@ func GetGiocatori(db *sqlx.DB) (*[]Giocatore, error) {
 
 func AddGiocatore(db *sqlx.DB, nome string) error {
 
-	_, err := db.Exec(`INSERT INTO giocatori VALUES ($1,0,0,0) `, nome)
+	_, err := db.Exec(`INSERT INTO giocatori VALUES ($1,0,0,0,0) `, nome)
 	if err != nil {
 		return err
 	}
@@ -42,7 +44,7 @@ func AddGiocatore(db *sqlx.DB, nome string) error {
 	return nil
 }
 
-func SalvaRecordPartita(db *sqlx.DB) {
+func SalvaRecordPartita(db *sqlx.DB, contoRound int) {
 	finePartita, err := GetCurrentGiocatori(db)
 	if err != nil {
 		log.Println("Errore prendendo currentGiocatori: " + err.Error())
@@ -62,8 +64,9 @@ func SalvaRecordPartita(db *sqlx.DB) {
 			if punti == puntiVincitore {
 				g.Vittorie++
 			}
-			_, err := db.Exec(`UPDATE giocatori SET partite = $1, vittorie = $2, puntitotali = $3 WHERE nome = $4`,
-				g.Partite, g.Vittorie, g.PuntiTot, g.Nome)
+			g.Round += contoRound
+			_, err := db.Exec(`UPDATE giocatori SET partite = $1, vittorie = $2, puntitotali = $3, round = $4 WHERE nome = $5`,
+				g.Partite, g.Vittorie, g.PuntiTot, g.Round, g.Nome)
 			if err != nil {
 				log.Println("Errore salvando record: " + err.Error())
 			}

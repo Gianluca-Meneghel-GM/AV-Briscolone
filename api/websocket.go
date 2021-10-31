@@ -55,9 +55,6 @@ func ascolta(conn *websocket.Conn) {
 			iniziaManoHandler()
 		case "altroRound":
 			altroRoundHandler(messaggio)
-		case "altroRoundBot":
-			idBot, _ := strconv.Atoi(messaggio.Params[0])
-			altroRoundHandler(messaggioDaClient{Mittente: idBot})
 		case "bastaCosì":
 			bastaCosiHandler()
 		}
@@ -75,11 +72,8 @@ func registraWebSocket(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-
 	connessioni[id] = ws
-
 	go ascolta(ws)
-
 	log.Println("Connesso col client " + idStr)
 }
 

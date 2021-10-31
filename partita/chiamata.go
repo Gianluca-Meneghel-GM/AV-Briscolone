@@ -10,10 +10,11 @@ var chiamante = -1
 var socio = -1
 var cartaChiamata string
 var haChiamato = false
+var chiamanteProvvisorio = -1
 
 func ChiamaValore(val, punti int) {
 	currentValChiamato = val
-	puntiVittoria = punti
+	puntiPerVittoria = punti
 }
 
 func GetChiamabili() []int {
@@ -32,6 +33,14 @@ func GetHaChiamato() bool {
 
 func GetCartaChiamata() string {
 	return cartaChiamata
+}
+
+func GetChiamanteProvvisorio() int {
+	return chiamanteProvvisorio
+}
+
+func SetChiamanteProvvisorio(id int) {
+	chiamanteProvvisorio = id
 }
 
 func GetAChiToccaChiamare() int {
@@ -75,7 +84,7 @@ func GetValChiamato() int {
 }
 
 func GetPuntiVittoria() int {
-	return puntiVittoria
+	return puntiPerVittoria
 }
 
 func SetChiamata(seme string) {

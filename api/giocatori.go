@@ -1,10 +1,11 @@
 package api
 
 import (
-	"../database"
-	"../partita"
-	"github.com/gorilla/mux"
+	"briscolone/database"
+	"briscolone/partita"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 func GetGiocatoriHandler(w http.ResponseWriter, req *http.Request, db *database.SqliteItemsAdapter) {
@@ -59,20 +60,20 @@ func SelectGiocatoreHandler(w http.ResponseWriter, req *http.Request, db *databa
 func iniziaPartita() {
 	giocatori := partita.IniziaPartita()
 	toccaA := partita.GetChiInizia()
-	for i:=range connessioni{
+	for i := range connessioni {
 		carte := partita.GetCarte(i)
 		scriviA(i, IniziaPartitaResp{Azione: "iniziaPartita", Carte: carte, CurrentGiocatori: *giocatori, ToccaA: toccaA})
 	}
 	chiamabili := partita.GetChiamabili()
-	broadcast(setChiamabiliResp{Azione: "setChiamabili", Chiamabili: chiamabili, ToccaA: toccaA, Chiamante: -1})
+	broadcast(setChiamabiliResp{Azione: "setChiamabili", Chiamabili: chiamabili, ToccaA: toccaA, Chiamante: -1, ChiamanteProvvisorio: -1})
 }
 
-func sonoProntoHandler(mex messaggioDaClient){
+func sonoProntoHandler(mex messaggioDaClient) {
 	iscritti := partita.GiocatoriIscritti()
 	scriviA(mex.Mittente, setRegistratiResp{Azione: "setRegistrati", Iscritti: iscritti})
 	partita.SetGiocatorePronto(mex.Mittente)
 	pronti := partita.GetGiocatoriPronti()
-	for _,g := range pronti{
+	for _, g := range pronti {
 		if !g {
 			return
 		}
@@ -82,7 +83,7 @@ func sonoProntoHandler(mex messaggioDaClient){
 
 func addBotsHandler() {
 	iscritti := partita.GiocatoriIscritti()
-	for i := iscritti; i<5; i++ {
+	for i := iscritti; i < 5; i++ {
 		partita.IscriviBot(i)
 	}
 	iniziaPartita()

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"../models"
+	"briscolone/models"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -25,12 +25,13 @@ type IniziaPartitaResp struct {
 }
 
 type setChiamabiliResp struct {
-	Azione        string
-	Chiamabili    []int
-	ToccaA        int
-	Chiamante     int
-	ValChiamato   int
-	PuntiVittoria int
+	Azione               string
+	Chiamabili           []int
+	ToccaA               int
+	Chiamante            int
+	ChiamanteProvvisorio int
+	ValChiamato          int
+	PuntiVittoria        int
 }
 
 type setGiocataResp struct {

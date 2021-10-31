@@ -1,12 +1,13 @@
 package main
 
 import (
-	"./api"
-	"./database"
-	"./partita"
+	"briscolone/api"
+	"briscolone/database"
+	"briscolone/partita"
+	"log"
+
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
-	"log"
 )
 
 func main() {

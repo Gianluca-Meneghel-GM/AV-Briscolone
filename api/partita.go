@@ -1,14 +1,15 @@
 package api
 
 import (
-	"../database"
-	"../partita"
-	"../store"
-	"github.com/gorilla/mux"
+	"briscolone/database"
+	"briscolone/partita"
+	"briscolone/store"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 func FinisciPartitaHandler(w http.ResponseWriter, req *http.Request, db *database.SqliteItemsAdapter) {
@@ -24,6 +25,7 @@ func FinisciPartitaHandler(w http.ResponseWriter, req *http.Request, db *databas
 		return
 	}
 	store.AzzeraNumeroGiocatori()
+	partita.ResetContoRound()
 	partita.ResetRound()
 	partita.ResetMano()
 
@@ -39,6 +41,7 @@ func chiamaValoreHandler(mex messaggioDaClient) {
 	giocatore := mex.Mittente
 	valoreStr := mex.Params[0]
 	puntiChiamatiStr := mex.Params[1]
+	chiamanteProvvisorio := partita.GetChiamanteProvvisorio()
 	partita.AumentaAChiToccaChiamare()
 	if valoreStr == "passo" {
 		inChiamata := partita.PassaChiamata(giocatore)
@@ -46,6 +49,8 @@ func chiamaValoreHandler(mex messaggioDaClient) {
 			partita.SetChiamante(inChiamata[0])
 		}
 	} else {
+		chiamanteProvvisorio = giocatore
+		partita.SetChiamanteProvvisorio(giocatore)
 		valore, err := strconv.Atoi(valoreStr)
 		if err != nil {
 			log.Println("errore leggendo val chiamato: " + err.Error())
@@ -62,8 +67,9 @@ func chiamaValoreHandler(mex messaggioDaClient) {
 	toccaA := partita.GetAChiToccaChiamare()
 	chiamante := partita.GetChiamante()
 	valChiamato := partita.GetValChiamato()
-	puntiVittoria := partita.GetPuntiVittoria()
-	broadcast(setChiamabiliResp{Azione: "setChiamabili", Chiamabili: chiamabili, ToccaA: toccaA, Chiamante: chiamante, ValChiamato: valChiamato, PuntiVittoria: puntiVittoria})
+	puntiPerVittoria := partita.GetPuntiVittoria()
+	broadcast(setChiamabiliResp{Azione: "setChiamabili", Chiamabili: chiamabili, ToccaA: toccaA, Chiamante: chiamante,
+		ValChiamato: valChiamato, PuntiVittoria: puntiPerVittoria, ChiamanteProvvisorio: chiamanteProvvisorio})
 }
 
 func chiamaBotHandler() {
@@ -124,7 +130,9 @@ func altroRoundHandler(mex messaggioDaClient) {
 	if mex.Mittente == 0 {
 		partita.ResetRound()
 	}
-	partita.SetGiocatorePronto(mex.Mittente)
+	for i := 0; i < 5; i++ {
+		partita.SetGiocatorePronto(i)
+	}
 	pronti := partita.GetGiocatoriPronti()
 	for _, g := range pronti {
 		if !g {

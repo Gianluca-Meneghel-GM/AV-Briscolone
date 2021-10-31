@@ -19,82 +19,13 @@
             </v-card>
         </v-dialog>
         <v-layout style="height:18vh;">
-            <v-flex xs6 :style="getStyleGiocatore(3)">
-                <v-layout style="justify-content: center">
-                    {{getNomeGiocatoreSuTavolo(3)}}
-                </v-layout>
-                <v-layout class="ma-3" style="justify-content: center">Carte: {{getCarteInMano(3)}}</v-layout>
-                <v-layout class="ma-3" style="justify-content: center">Prese: {{getPrese(3)}}</v-layout>
-            </v-flex>
-            <v-flex xs6 :style="getStyleGiocatore(2)">
-                <v-layout style="justify-content: center">
-                    {{getNomeGiocatoreSuTavolo(2)}}
-                </v-layout>
-                <v-layout class="ma-3" style="justify-content: center">Carte: {{getCarteInMano(2)}}</v-layout>
-                <v-layout class="ma-3" style="justify-content: center">Prese: {{getPrese(2)}}</v-layout>
-            </v-flex>
+            <box-giocatore :pos="3" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
+            <box-giocatore :pos="2" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
         </v-layout>
         <v-layout style="height:45vh">
-            <v-flex xs2 :style="getStyleGiocatore(4)">
-                <v-layout style="justify-content: center">
-                    {{getNomeGiocatoreSuTavolo(4)}}
-                </v-layout>
-                <v-layout class="ma-3" style="justify-content: center">Carte: {{getCarteInMano(4)}}</v-layout>
-                <v-layout class="ma-3" style="justify-content: center">Prese: {{getPrese(4)}}</v-layout>
-            </v-flex>
-            <v-flex xs8 style="background-color: #90B494">
-                <v-layout style="height: 22vh">
-                    <v-flex xs6 style="text-align: -webkit-center">
-                        <v-img
-                                v-if="haGiocato(3)"
-                                style="width: 9vh; margin: 5px"
-                                contain
-                                v-bind:src="getSpriteCarta(3)"
-                        ></v-img>
-                    </v-flex>
-                    <v-flex xs6 style="text-align: -webkit-center">
-                        <v-img
-                                v-if="haGiocato(2)"
-                                style="width: 9vh; margin: 5px"
-                                contain
-                                v-bind:src="getSpriteCarta(2)"
-                        ></v-img>
-                    </v-flex>
-                </v-layout>
-                <v-layout style="height: 22vh">
-                    <v-flex xs3>
-                        <v-img
-                                v-if="haGiocato(4)"
-                                style="width: 9vh; margin: 5px"
-                                contain
-                                v-bind:src="getSpriteCarta(4)"
-                        ></v-img>
-                    </v-flex>
-                    <v-flex xs6 style="text-align: -webkit-center">
-                        <v-img
-                                v-if="haGiocato(0)"
-                                style="width: 9vh; margin: 5px"
-                                contain
-                                v-bind:src="getSpriteCarta(0)"
-                        ></v-img>
-                    </v-flex>
-                    <v-flex xs3 style="text-align: -webkit-right">
-                        <v-img
-                                v-if="haGiocato(1)"
-                                style="width: 9vh; margin: 5px"
-                                contain
-                                v-bind:src="getSpriteCarta(1)"
-                        ></v-img>
-                    </v-flex>
-                </v-layout>
-            </v-flex>
-            <v-flex xs2 :style="getStyleGiocatore(1)">
-                <v-layout style="justify-content: center">
-                    {{getNomeGiocatoreSuTavolo(1)}}
-                </v-layout>
-                <v-layout class="ma-3" style="justify-content: center">Carte: {{getCarteInMano(1)}}</v-layout>
-                <v-layout class="ma-3" style="justify-content: center">Prese: {{getPrese(1)}}</v-layout>
-            </v-flex>
+            <box-giocatore :pos="4" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
+            <tavolo :mano="mano" :valChiamato="valChiamato" :carteQuestaMano="carteQuestaMano"></tavolo>
+            <box-giocatore :pos="1" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
         </v-layout>
         <v-layout style="justify-content: center;height:4vh">
             <div class="ma-3">Prese: {{getPrese(0)}}</div>
@@ -108,20 +39,16 @@
                 <v-btn class="ma-3" color="#718F94" style="color: white" @click="giocaCarta">Giocala</v-btn>
                 <!--v-btn class="ma-3" color="#718F94" style="color: white" @click="tuttoNostro">Tutto nostro</v-btn-->
             </div>
-            <div v-if="this.toccaA === -1 && finePrimaMano && chiamante === me">
-                <v-btn class="ma-3" color="#718F94" style="color: white"
-                       @click="chiamaDialog = true; showSemi = true">Scegli seme</v-btn>
-            </div>
         </v-layout>
         <v-layout style="justify-content: center; height: 24vh">
-            <v-flex xs2>Tocca a: {{getNomeGiocatore(toccaA)}}</v-flex>
+            <v-flex xs2>Tocca a: <b style="color: #4454e3">{{getNomeGiocatore(toccaA)}}</b></v-flex>
             <v-flex xs8 :style="getStyleGiocatore(0)">
                 <v-layout style="justify-content: center;">
                     <div v-for="(carta, i) in carte" :key="i">
                         <v-img
                                 :style="getStyleCarta(carta)"
                                 contain
-                                v-bind:src="require(`../assets/${$store.state.mazzo}/${carta.Valore + carta.SemeStr}.png`)"
+                                :src="require(`../assets/${$store.state.mazzo}/${carta.Valore + carta.SemeStr}.png`)"
                                 @click="toggleSelection(carta)"
                         ></v-img>
                     </div>
@@ -129,18 +56,18 @@
             </v-flex>
             <v-flex xs2>
                 <div>
-                    <v-layout v-if="showCartaSocio" style="justify-content: center;">Carta del socio:</v-layout>
-                    <v-layout v-else style="justify-content: center;">Carta chiamata:</v-layout>
+                    <v-layout v-if="showCartaSocio" style="justify-content: center; font-style: italic"><b>Carta del socio:</b></v-layout>
+                    <v-layout v-else style="justify-content: center; font-style: italic"><b>Carta chiamata:</b></v-layout>
                     <v-layout style="justify-content: center;">
-                        {{getNomeCarta(valChiamato)}} <div v-if="showCartaSocio">, di {{getNomeSeme(briscola)}} </div>
+                        <b style="color: #6e0021">{{getNomeCarta(valChiamato)}} <div v-if="showCartaSocio"> di {{getNomeSeme(briscola)}} </div></b>
                     </v-layout>
-                    <v-layout style="justify-content: center;" class="mt-4">Chiamante:</v-layout>
+                    <v-layout style="justify-content: center;" class="mt-4"><b>Chiamante:</b></v-layout>
                     <v-layout style="justify-content: center;">
-                        {{getNomeGiocatore(chiamante)}}
+                        <h2 style="color: #6e0021">{{getNomeGiocatore(chiamante)}}</h2>
                     </v-layout>
-                    <v-layout style="justify-content: center;" class="mt-4">Punti per vincere:</v-layout>
+                    <v-layout style="justify-content: center; font-style: italic" class="mt-4"><b>Punti per vincere:</b></v-layout>
                     <v-layout style="justify-content: center;">
-                        {{puntiVittoria}}
+                        <h2 style="color: #6e0021">{{puntiVittoria}}</h2>
                     </v-layout>
                 </div>
             </v-flex>
@@ -260,9 +187,15 @@
 
 <script>
     import partitaApi from "../api/partitaApi";
+    import BoxGiocatore from "../components/BoxGiocatore.vue"
+    import Tavolo from '../components/Tavolo.vue'
 
     export default {
         name: "Partita",
+        components:{
+            BoxGiocatore,
+            Tavolo
+        },
         data: () => ({
             ws: {},
             me: 0,
@@ -273,7 +206,6 @@
             showPunteggiTotali: false,
             puntiChiamati: 61,
             sonoProntoBtn: true,
-            finePrimaMano: false,
             missingPlayers: '',
             carte: [],
             toccaA: 0,
@@ -285,7 +217,6 @@
             showCartaSocio: false,
             showCarteGirate: false,
             carteInMano: [],
-            mano: 0,
             carteQuestaMano: {},
             selectedCarta: {},
             valChiamato: '',
@@ -294,7 +225,8 @@
             cartaChiamata: '',
             datiVittoria: {},
             giocatori: [],
-            puntiDiOggi: {}
+            puntiDiOggi: {},
+            mano: undefined
         }),
         mounted() {
             this.me = this.$store.state.giocatore.id
@@ -317,7 +249,7 @@
                 let messaggio = {azione: azione, mittente: this.me, params: params}
                 let json = JSON.stringify(messaggio)
                 this.ws.send(json)
-                console.log("mandato " + json)
+                //console.log("mandato " + json)
             },
             registerWebSocket(id) {
                 var currentLocation = window.location;
@@ -328,11 +260,11 @@
                 let baseURL = `//` + currentLocation.hostname + `:` + port;
                 this.ws = new WebSocket("ws://" + baseURL + "/ws/registra/" + id);
                 this.ws.onopen = function () {
-                    console.log(id + " Connesso")
+                    //console.log(id + " Connesso")
                 }
                 this.ws.onmessage = (event) => {
                     let messaggio = JSON.parse(event.data)
-                    console.log("ricevuto " + event.data)
+                    //console.log("ricevuto " + event.data)
                     switch (messaggio.Azione) {
                         case "setRegistrati":
                             this.setRegistrati(messaggio)
@@ -380,7 +312,8 @@
                 this.valChiamato = ''
                 this.puntiChiamati = 61
                 this.chiamanteProvvisorio = ''
-                this.puntiDiOggi = {}
+                this.puntiDiOggi = {},
+                this.mano = undefined
             },
             iniziaPartita(resp) {
                 this.clearVariabili()
@@ -416,19 +349,15 @@
             iniziaRound(resp) {
                 this.chiamaDialog = false
                 this.setTurno(resp.ToccaA)
-                this.chiamante = resp.Chiamante
-                this.valChiamato = resp.ValChiamato
-                this.puntiVittoria = resp.PuntiVittoria
+                this.briscola = resp.Briscola
                 if (this.me === 0 && this.$store.state.giocatori[this.toccaA].IsBot) {
                     this.giocaCartaBot(this.toccaA)
                 }
             },
             giraCarte() {
                 this.showCarteGirate = true
-                this.finePrimaMano = true
             },
             iniziaAltroRound() {
-                this.finePrimaMano = false
                 this.mandaMessaggio('altroRound')
             },
             finePartita(resp) {
@@ -440,20 +369,20 @@
                     inMano: resp.CarteInMano,
                     prese: resp.CartePrese
                 })
-                if (resp.Briscola) {
-                    this.briscola = resp.Briscola
-                    this.showCartaSocio = true
-                }
                 this.carteQuestaMano = resp.CarteGiocate
                 this.setTurno(resp.ToccaA)
-                if (resp.Mano === 0 && resp.ToccaA === -1) {
-                debugger
-                    this.giraCarte()
-                    this.$forceUpdate()
-                    return
+                if(this.mano !== resp.Mano){
+                    this.mano = resp.Mano;
                 }
-                else if (this.carteQuestaMano && Object.keys(this.carteQuestaMano).length === 5) {
-                    setTimeout(() => this.svuotaTavolo(resp.Mano), 3500)
+                if (resp.Mano === 1) {
+                    this.showCartaSocio = true
+                }
+                if (this.carteQuestaMano && Object.keys(this.carteQuestaMano).length === 5) {
+                    let timeout = 3500;
+                    if(this.mano === 0){
+                        timeout = 5000;
+                    }
+                    setTimeout(() => this.svuotaTavolo(resp.Mano), timeout)
                 } else {
                     if (this.me === 0 && this.$store.state.giocatori[this.toccaA].IsBot === 1) {
                         this.giocaCartaBot(this.toccaA)
@@ -471,15 +400,7 @@
                 return "width: 9vh; margin: 5px;" + border + marginTop
             },
             getStyleGiocatore(pos) {
-                let border = "border: 3px solid #718F94;"
-                let color = "#DBCFB0"
-                if (this.getGiocatoreInPos(pos) === this.toccaA) {
-                    border += "border: 3px solid #FE654F;"
-                }
-                if (this.getGiocatoreInPos(pos) === this.chiamante) {
-                    color = "#C37D92"
-                }
-                return "background-color: " + color + " ; border-radius: 6px; " + border
+                return this.$store.getters.getStyleGiocatore(pos, this.toccaA, this.chiamante);
             },
             getNomeCarta(val) {
                 switch (val) {
@@ -522,35 +443,11 @@
                     this.$forceUpdate()
                 }
             },
-            getNomeGiocatoreSuTavolo(pos) {
-                let giocatori = this.$store.state.giocatori
-                if (giocatori[this.getGiocatoreInPos(pos)]) {
-                    return giocatori[this.getGiocatoreInPos(pos)].Nome
-                } else {
-                    return 'boh'
-                }
-            },
             getNomeGiocatore(id) {
                 return this.$store.state.giocatori[id] ? this.$store.state.giocatori[id].Nome : 'nessuno'
             },
             chiamaSeme(seme) {
                 this.mandaMessaggio("chiamaSeme", [seme.toString()])
-                this.showCartaSocio = true
-                this.chiamaDialog = false
-                this.svuotaTavolo(0)
-            },
-            haGiocato(pos) {
-                if (this.carteQuestaMano && this.carteQuestaMano[this.getGiocatoreInPos(pos)]) {
-                    return true
-                }
-                return false
-            },
-            getCartaQuestaMano(pos) {
-                let carta = '2S'
-                if (this.carteQuestaMano[this.getGiocatoreInPos(pos)]) {
-                    carta = this.carteQuestaMano[this.getGiocatoreInPos(pos)]
-                }
-                return carta
             },
             svuotaTavolo(mano) {
                 this.carteQuestaMano = []
@@ -578,16 +475,6 @@
                 this.toccaA = toccaA
                 this.toccaAMe = this.toccaA === this.me;
             },
-            getCarteInMano(pos) {
-                let carte = 0
-                let giocatori = this.$store.state.giocatori
-                if (giocatori[this.getGiocatoreInPos(pos)]) {
-                    carte = giocatori[this.getGiocatoreInPos(pos)].carteInMano
-                } else {
-                    return 'boh'
-                }
-                return carte
-            },
             getPrese(pos) {
                 let carte = 0
                 let giocatori = this.$store.state.giocatori
@@ -613,7 +500,8 @@
 
             },
             getGiocatoreInPos(pos) {
-                return ((this.me + pos) % 5)
+                //return ((this.me + pos) % 5)
+                return this.$store.getters.getGiocatoreInPos(pos);
             },
             setBots() {
                 this.mandaMessaggio("addBots")
@@ -626,13 +514,6 @@
             },
             mandaMessaggioBot(id) {
                 this.mandaMessaggio("giocaCartaBot", [id.toString()])
-            },
-            getSpriteCarta(pos) {
-                let carta = this.getCartaQuestaMano(pos)
-                if (!this.showCartaSocio && carta.Valore === this.valChiamato && !this.showCarteGirate) {
-                    return require(`../assets/${this.$store.state.mazzo}/retro.png`)
-                }
-                return require(`../assets/${this.$store.state.mazzo}/${carta.Valore + carta.SemeStr}.png`)
             },
             getVincitoriStr(vinc) {
                 if (!vinc)
