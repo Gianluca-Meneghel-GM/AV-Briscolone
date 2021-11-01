@@ -26,6 +26,19 @@ export default new Vuex.Store({
             
             return "background-color: " + color + " ; border-radius: 6px; " + border
         },
+        getPrese: (state, getters) => (pos) => {
+            let carte = 0
+            let giocatori = state.giocatori
+            if (giocatori[getters.getGiocatoreInPos(pos)]) {
+                carte = giocatori[getters.getGiocatoreInPos(pos)].cartePrese
+            }
+
+            if (carte !== undefined) {
+                return carte / 5
+            }
+
+            return '-'
+        },
         getGiocatoreInPos: (state) => (pos) => {
             return ((state.giocatore.id + pos) % 5)
         }

@@ -27,9 +27,9 @@
             <tavolo :mano="mano" :valChiamato="valChiamato" :carteQuestaMano="carteQuestaMano"></tavolo>
             <box-giocatore :pos="1" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
         </v-layout>
-        <v-layout style="justify-content: center;height:4vh">
-            <div class="ma-3">Prese: {{getPrese(0)}}</div>
-            <v-btn v-if="sonoProntoBtn" class="ma-3" color="#718F94" style="color: white" @click="sonoPronto()">Sono
+        <v-layout style="justify-content: center; height:4.5vh; margin-bottom:5px">
+            <div class="ma-3"><b style="font-style: italic; padding-right: 0.5vh;">Prese:</b><b style="color:#4454e3; padding-right: 0.5vh;">{{getPrese(0)}}</b></div>
+            <v-btn v-if="sonoProntoBtn" class="ma-3" color="#718F94" style="color: white;" @click="sonoPronto()">Sono
                 pronto
             </v-btn>
             <v-btn v-if="sommaPunti < 3" class="ma-3" color="#718F94" style="color: white" @click="giocaCarta">a
@@ -41,11 +41,11 @@
             </div>
         </v-layout>
         <v-layout style="justify-content: center; height: 24vh">
-            <v-flex xs2>Tocca a: <b style="color: #4454e3">{{getNomeGiocatore(toccaA)}}</b></v-flex>
+            <v-flex xs2><h2 style=" font-style: italic; padding-right: 0.5vh;">Tocca a: </h2><h1 style="color: #4454e3">{{getNomeGiocatore(toccaA)}}</h1></v-flex>
             <v-flex xs8 :style="getStyleGiocatore(0)">
                 <v-layout style="justify-content: center;">
-                    <div v-for="(carta, i) in carte" :key="i">
-                        <v-img
+                    <div v-for="(carta,i) in carte" :key="i">
+                        <v-img :class="{transform: selectedCarta === carta}"
                                 :style="getStyleCarta(carta)"
                                 contain
                                 :src="require(`../assets/${$store.state.mazzo}/${carta.Valore + carta.SemeStr}.png`)"
@@ -54,22 +54,20 @@
                     </div>
                 </v-layout>
             </v-flex>
-            <v-flex xs2>
-                <div>
-                    <v-layout v-if="showCartaSocio" style="justify-content: center; font-style: italic"><b>Carta del socio:</b></v-layout>
-                    <v-layout v-else style="justify-content: center; font-style: italic"><b>Carta chiamata:</b></v-layout>
-                    <v-layout style="justify-content: center;">
-                        <b style="color: #6e0021">{{getNomeCarta(valChiamato)}} <div v-if="showCartaSocio"> di {{getNomeSeme(briscola)}} </div></b>
-                    </v-layout>
-                    <v-layout style="justify-content: center;" class="mt-4"><b>Chiamante:</b></v-layout>
-                    <v-layout style="justify-content: center;">
-                        <h2 style="color: #6e0021">{{getNomeGiocatore(chiamante)}}</h2>
-                    </v-layout>
-                    <v-layout style="justify-content: center; font-style: italic" class="mt-4"><b>Punti per vincere:</b></v-layout>
-                    <v-layout style="justify-content: center;">
-                        <h2 style="color: #6e0021">{{puntiVittoria}}</h2>
-                    </v-layout>
-                </div>
+            <v-flex xs2>                
+                <v-layout v-if="showCartaSocio" style="justify-content: center; font-style: italic"><b>Carta del socio:</b></v-layout>
+                <v-layout v-else style="justify-content: center; font-style: italic"><b>Carta chiamata:</b></v-layout>
+                <v-layout style="justify-content: center;">
+                    <b style="color: #6e0021">{{getNomeCarta(valChiamato)}} <div v-if="showCartaSocio"> di {{getNomeSeme(briscola)}} </div></b>
+                </v-layout>
+                <v-layout style="justify-content: center; font-style: italic" class="mt-4"><b>Chiamante:</b></v-layout>
+                <v-layout style="justify-content: center;">
+                    <h2 style="color: #6e0021">{{getNomeGiocatore(chiamante)}}</h2>
+                </v-layout>
+                <v-layout style="justify-content: center; font-style: italic" class="mt-4"><b>Punti per vincere:</b></v-layout>
+                <v-layout style="justify-content: center;">
+                    <h2 style="color: #6e0021">{{puntiVittoria}}</h2>
+                </v-layout>
             </v-flex>
         </v-layout>
         <v-dialog
@@ -392,12 +390,10 @@
             },
             getStyleCarta(carta) {
                 let border = "border: ;"
-                let marginTop = "margin-top: 40px;"
                 if (carta.isSelected) {
-                    border += "border: 5px solid #FE654F;"
-                    marginTop = "margin-top: 0px;"
+                    border += "border: 5px solid #24ccf2;"
                 }
-                return "width: 9vh; margin: 5px;" + border + marginTop
+                return "width: 9vh; margin-top: 30px; margin-left: 5px; margin-right: 5px; margin-bottom: 5px;" + border
             },
             getStyleGiocatore(pos) {
                 return this.$store.getters.getStyleGiocatore(pos, this.toccaA, this.chiamante);
@@ -444,7 +440,7 @@
                 }
             },
             getNomeGiocatore(id) {
-                return this.$store.state.giocatori[id] ? this.$store.state.giocatori[id].Nome : 'nessuno'
+                return this.$store.state.giocatori[id] ? this.$store.state.giocatori[id].Nome : ''
             },
             chiamaSeme(seme) {
                 this.mandaMessaggio("chiamaSeme", [seme.toString()])
@@ -476,14 +472,7 @@
                 this.toccaAMe = this.toccaA === this.me;
             },
             getPrese(pos) {
-                let carte = 0
-                let giocatori = this.$store.state.giocatori
-                if (giocatori[this.getGiocatoreInPos(pos)]) {
-                    carte = giocatori[this.getGiocatoreInPos(pos)].cartePrese
-                } else {
-                    return 'boh'
-                }
-                return carte / 5
+                return this.$store.getters.getPrese(pos);
             },
             giocaCarta() {
                 if (this.toccaAMe && this.selectedCarta.Valore !== 0) {
@@ -535,5 +524,24 @@
 </script>
 
 <style scoped>
+
+.transform {
+  /*transform: translateX(-150px);*/
+  animation: slide-scale 0.2s ease-in forwards;
+}
+
+@keyframes slide-scale{
+  0% {
+    transform: translateY(0) scale(1);
+  }
+
+  70% {
+    transform: translateY(-15px) scale(1.05);
+  }
+
+  100% {
+    transform: translateY(-25px) scale(1.1);
+  }
+}
 
 </style>

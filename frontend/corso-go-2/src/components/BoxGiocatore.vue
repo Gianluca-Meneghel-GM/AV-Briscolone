@@ -4,8 +4,14 @@
         <v-layout :style="getStyleNomeGiocatore()">
             <h2>{{getNomeGiocatoreSuTavolo()}}</h2>
         </v-layout>
-        <v-layout class="ma-3" style="justify-content: center">Carte: {{getCarteInMano()}}</v-layout>
-        <v-layout class="ma-3" style="justify-content: center">Prese: {{getPrese()}}</v-layout>
+        <v-layout class="ma-3" style="justify-content: center">
+            <b style=" font-style: italic; padding-right: 0.5vh;">Carte:</b>
+            <b :style="getStyleSelectedColor()">{{getCarteInMano()}}</b>
+        </v-layout>
+        <v-layout class="ma-3" style="justify-content: center">
+            <b style=" font-style: italic; padding-right: 0.5vh;">Prese:</b>
+            <b :style="getStyleSelectedColor()">{{getPrese()}}</b>
+        </v-layout>
     </v-flex>
 </template>
 
@@ -39,10 +45,17 @@ function getColor(str){
             getStyleGiocatore() {
                 return this.$store.getters.getStyleGiocatore(this.pos, this.toccaA, this.chiamante);
             },
+            getStyleSelectedColor(){
+                let style = "color: black;"
+                if(this.toccaA === this.getGiocatoreInPos()){
+                    style = "color: #4454e3"
+                }
+                return style
+            },
             getStyleNomeGiocatore() {
                 let style = "justify-content: center;"
                 if(this.toccaA === this.getGiocatoreInPos()){
-                    style = "justify-content: center; color: #4454e3"
+                    style = "justify-content: center;" + this.getStyleSelectedColor();
                 }
                 return style
             },
@@ -51,7 +64,7 @@ function getColor(str){
                 if (giocatori[this.getGiocatoreInPos()]) {
                     return giocatori[this.getGiocatoreInPos()].Nome
                 } else {
-                    return 'boh'
+                    return ''
                 }
             },
             getCarteInMano() {
@@ -60,19 +73,12 @@ function getColor(str){
                 if (giocatori[this.getGiocatoreInPos()]) {
                     carte = giocatori[this.getGiocatoreInPos()].carteInMano
                 } else {
-                    return 'boh'
+                    return ''
                 }
                 return carte
             },
             getPrese() {
-                let carte = 0
-                let giocatori = this.$store.state.giocatori
-                if (giocatori[this.getGiocatoreInPos()]) {
-                    carte = giocatori[this.getGiocatoreInPos()].cartePrese
-                } else {
-                    return 'boh'
-                }
-                return carte / 5
+                return this.$store.getters.getPrese(this.pos);
             },
             getGiocatoreInPos() {
                 return this.$store.getters.getGiocatoreInPos(this.pos);

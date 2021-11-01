@@ -28,7 +28,7 @@
           </v-list>
         </v-menu>
       </div>
-      <v-btn @click="finisciPartita">Finiscila</v-btn>
+      <v-btn v-if="showFiniscila()" @click="finisciPartita">Finiscila</v-btn>
     </v-app-bar>
 
     <v-content>
@@ -58,13 +58,19 @@
     },
     methods: {
       finisciPartita(){
-        partitaApi.finiscila().then(t => {
+        partitaApi.finiscila()
+        /*.then(t => {
           if (t.status === 200) {
           }
         })
+        */
       },
       setMazzo(mazzo){
         this.$store.dispatch('setMazzo', mazzo.toLowerCase())
+      },
+      showFiniscila(){
+        //console.log("showFiniscila", this.$store.state.giocatore)
+        return this.$store.state.giocatore.id == undefined || this.$store.state.giocatore.id === 0;
       }
     }
   }
