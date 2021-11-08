@@ -19,15 +19,15 @@
             </v-card>
         </v-dialog>
         <v-layout style="height:18vh;">
-            <box-giocatore :pos="3" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
-            <box-giocatore :pos="2" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
+            <box-giocatore ref="box3" :pos="3" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
+            <box-giocatore ref="box2" :pos="2" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
         </v-layout>
         <v-layout style="height:45vh">
-            <box-giocatore :pos="4" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
-            <tavolo :mano="mano" :valChiamato="valChiamato" :carteQuestaMano="carteQuestaMano"></tavolo>
-            <box-giocatore :pos="1" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
+            <box-giocatore ref="box4" :pos="4" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
+            <tavolo :coordGiocatore="coordGiocatore" :mano="mano" :valChiamato="valChiamato" :carteQuestaMano="carteQuestaMano"></tavolo>
+            <box-giocatore ref="box1" :pos="1" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
         </v-layout>
-        <v-layout style="justify-content: center; height:4.5vh; margin-bottom:5px">
+        <v-layout style="justify-content: center; height:4vh">
             <div class="ma-3"><b style="font-style: italic; padding-right: 0.5vh;">Prese:</b><b style="color:#4454e3; padding-right: 0.5vh;">{{getPrese(0)}}</b></div>
             <v-btn v-if="sonoProntoBtn" class="ma-3" color="#718F94" style="color: white;" @click="sonoPronto()">Sono
                 pronto
@@ -43,7 +43,7 @@
         <v-layout style="justify-content: center; height: 24vh">
             <v-flex xs2><h2 style=" font-style: italic; padding-right: 0.5vh;">Tocca a: </h2><h1 style="color: #4454e3">{{getNomeGiocatore(toccaA)}}</h1></v-flex>
             <v-flex xs8 :style="getStyleGiocatore(0)">
-                <v-layout style="justify-content: center;">
+                <v-layout style="justify-content: center;" ref="box0">
                     <div v-for="(carta,i) in carte" :key="i">
                         <v-img :class="{transform: selectedCarta === carta}"
                                 :style="getStyleCarta(carta)"
@@ -58,16 +58,10 @@
                 <v-layout v-if="showCartaSocio" style="justify-content: center; font-style: italic"><b>Carta del socio:</b></v-layout>
                 <v-layout v-else style="justify-content: center; font-style: italic"><b>Carta chiamata:</b></v-layout>
                 <v-layout style="justify-content: center;">
-                    <b style="color: #6e0021">{{getNomeCarta(valChiamato)}} <div v-if="showCartaSocio"> di {{getNomeSeme(briscola)}} </div></b>
+                    <b style="color: #6e0021">{{cartaChiamata}}</b>
                 </v-layout>
-                <v-layout style="justify-content: center; font-style: italic" class="mt-4"><b>Chiamante:</b></v-layout>
-                <v-layout style="justify-content: center;">
-                    <h2 style="color: #6e0021">{{getNomeGiocatore(chiamante)}}</h2>
-                </v-layout>
-                <v-layout style="justify-content: center; font-style: italic" class="mt-4"><b>Punti per vincere:</b></v-layout>
-                <v-layout style="justify-content: center;">
-                    <h2 style="color: #6e0021">{{puntiVittoria}}</h2>
-                </v-layout>
+                <v-layout style="justify-content: center; font-style: italic; padding-right: 0.5vh;" class="mt-4"><b>Chiamante:</b><b style="color: #6e0021">{{getNomeGiocatore(chiamante)}}</b></v-layout>
+                <v-layout style="justify-content: center; font-style: italic; padding-right: 0.5vh;" class="mt-4"><b>Punti per vincere:</b><b style="color: #6e0021">{{puntiVittoria}}</b></v-layout>
             </v-flex>
         </v-layout>
         <v-dialog
@@ -77,10 +71,10 @@
         >
             <v-card>
                 <v-card-title class="headline lighten-2 pa-3" style="background-color: #DBCFB0">
-                    Fase di Chiamata
+                    <b>Fase di Chiamata</b>
                     <v-spacer/>
-                    <div v-if="valChiamato !== ''" class="ma-3"> {{getNomeGiocatore(chiamanteProvvisorio)}} ha chiamato:
-                        {{getNomeCarta(valChiamato)}}
+                    <div v-if="valChiamato !== ''" class="ma-3"> 
+                        <b style="color: #4454e3">{{getNomeGiocatore(chiamanteProvvisorio)}}</b> ha chiamato: <b style="color: #4454e3">{{getNomeCarta(valChiamato)}}</b>
                     </div>
                 </v-card-title>
                 <v-card-text style="text-align: center; background-color: #90B494">
@@ -123,8 +117,8 @@
                 </v-card-title>
                 <v-card-text style="text-align: center; background-color: #90B494">
                     <div class="pa-3" style="font-size: 1.3em; font-weight: bold">
-                        Han vinto {{getVincitoriStr(datiVittoria.Vincitori)}}{{datiVittoria.PuntiVincitori}} a {{120 -
-                        datiVittoria.PuntiVincitori}}
+                        Han vinto <b style="color: #4454e3">{{getVincitoriStr(datiVittoria.Vincitori)}}</b> <b style="color: #064723">{{datiVittoria.PuntiVincitori}}</b> a <b style="color: #a01118">{{120 -
+                        datiVittoria.PuntiVincitori}}</b>
                     </div>
                     <v-simple-table v-if="!showPunteggiTotali" style="background-color: #DBCFB0">
                         <template v-slot:default>
@@ -220,11 +214,12 @@
             valChiamato: '',
             chiamanteProvvisorio: '',
             briscola: '',
-            cartaChiamata: '',
             datiVittoria: {},
             giocatori: [],
             puntiDiOggi: {},
-            mano: undefined
+            mano: undefined,
+            coordGiocatore: undefined,
+            haIniziatoIlRound: undefined,
         }),
         mounted() {
             this.me = this.$store.state.giocatore.id
@@ -241,6 +236,13 @@
                 }
                 return punti
             },
+            cartaChiamata(){
+                let val = this.getNomeCarta(this.valChiamato);
+                if(this.showCartaSocio){
+                    val = val + ' di ' + this.getNomeSeme(this.briscola)
+                }
+                return val
+            }
         },
         methods: {
             mandaMessaggio(azione, params) {
@@ -363,37 +365,45 @@
                 this.showPunteggiTotali = true
             },
             setGiocata(resp) {
-                this.$store.dispatch("setCarteGiocatori", {
+                let carte = {
                     inMano: resp.CarteInMano,
                     prese: resp.CartePrese
-                })
-                this.carteQuestaMano = resp.CarteGiocate
-                this.setTurno(resp.ToccaA)
-                if(this.mano !== resp.Mano){
-                    this.mano = resp.Mano;
-                }
-                if (resp.Mano === 1) {
-                    this.showCartaSocio = true
-                }
-                if (this.carteQuestaMano && Object.keys(this.carteQuestaMano).length === 5) {
-                    let timeout = 3500;
-                    if(this.mano === 0){
-                        timeout = 5000;
+                };
+                this.$store.dispatch("setCarteGiocatori", carte).then( () => {
+
+                    if(resp.CarteGiocate && Object.entries(resp.CarteGiocate).length == 1) {
+                        this.haIniziatoIlRound = this.toccaA;
                     }
-                    setTimeout(() => this.svuotaTavolo(resp.Mano), timeout)
-                } else {
-                    if (this.me === 0 && this.$store.state.giocatori[this.toccaA].IsBot === 1) {
-                        this.giocaCartaBot(this.toccaA)
+
+                    this.carteQuestaMano = resp.CarteGiocate
+                    this.setTurno(resp.ToccaA)
+                    if(this.mano !== resp.Mano){
+                        this.mano = resp.Mano;
                     }
-                }
-                this.$forceUpdate()
+                    if (resp.Mano === 1) {
+                        this.showCartaSocio = true
+                    }
+                    if (this.carteQuestaMano && Object.keys(this.carteQuestaMano).length === 5) {
+                        let timeout = 3500;
+                        if(this.mano === 0){
+                            timeout = 5000;
+                        }
+                        setTimeout(() => this.svuotaTavolo(resp.Mano), timeout)
+                    }
+                    else {
+                        if (this.me === 0 && this.$store.state.giocatori[this.toccaA].IsBot === 1) {
+                            this.giocaCartaBot(this.toccaA)
+                        }
+                    }
+                    this.$forceUpdate()
+                });
             },
             getStyleCarta(carta) {
                 let border = "border: ;"
                 if (carta.isSelected) {
                     border += "border: 5px solid #24ccf2;"
                 }
-                return "width: 9vh; margin-top: 30px; margin-left: 5px; margin-right: 5px; margin-bottom: 5px;" + border
+                return "width: 8vh; margin-top: 30px; margin-left: 2px; margin-right: 2px; margin-bottom: 5px;" + border
             },
             getStyleGiocatore(pos) {
                 return this.$store.getters.getStyleGiocatore(pos, this.toccaA, this.chiamante);
@@ -446,12 +456,106 @@
                 this.mandaMessaggio("chiamaSeme", [seme.toString()])
             },
             svuotaTavolo(mano) {
+                this.aggiornaCoordGiocatoreCheHaPreso();
                 this.carteQuestaMano = []
                 if (mano === 7) {
                     this.mostraVittoria()
-                } else {
+                }
+                else {
                     this.iniziaNuovaMano()
                 }
+            },
+            aggiornaCoordGiocatoreCheHaPreso(){
+                try{
+                    let giocatoreCheHaPreso = this.getGiocatoreCheHaVintoLaMano();
+                    this.haIniziatoIlRound = undefined;
+                    let posizione = this.getPosizioneFromIdGiocatore(giocatoreCheHaPreso);
+                    if(posizione >= 0){
+                        let el;
+                        if(posizione === 0){
+                            el = this.$refs.box0;    
+
+                        }
+                        else if(posizione === 1){
+                            el = this.$refs.box1.$el;    
+                        }
+                        else if(posizione === 2){
+                            el = this.$refs.box2.$el;  
+                        }
+                        else if(posizione === 3){
+                            el = this.$refs.box3.$el;  
+                        }
+                        else if(posizione === 4){
+                            el = this.$refs.box4.$el;  
+                        }
+
+                        if(el != undefined){
+                            this.coordGiocatore = {
+                                pos: posizione,
+                                offsetLeft: el.offsetLeft,
+                                offsetTop: el.offsetTop,
+                                width: el.getBoundingClientRect().width,
+                                height: el.getBoundingClientRect().height
+                            }
+                        }
+                    }
+                }
+                catch(e){
+                    //console.log(e);
+                }
+            },
+            getGiocatoreCheHaVintoLaMano(){
+                let giocatoreCheHaPreso = -1;
+                let tmpValore = -1
+
+                let briscolaMano = "";
+                for (let key in this.carteQuestaMano) {
+                    if(this.carteQuestaMano[key].SemeStr === this.briscola){
+                        briscolaMano = this.briscola;
+                        break;
+                    }
+
+                    let idGioc = Number(key);
+                    if(idGioc === this.haIniziatoIlRound){
+                        briscolaMano = this.carteQuestaMano[key].SemeStr;
+                    }
+                }
+
+                //console.log("************      MANO => " + this.mano + "      ****************")
+
+                //console.log("briscola di mano: "+ briscolaMano)
+                for (let key in this.carteQuestaMano) {
+                    let valCarta = this.carteQuestaMano[key].Valore;
+                    let semeCarta = this.carteQuestaMano[key].SemeStr
+                    let calcValore = briscolaMano === semeCarta ? valCarta + 100 : valCarta;
+
+                    //console.log("giocatore: " + key + " seme: " + semeCarta + " val: " + valCarta + " => valore calcolato => " + calcValore);
+                    if (calcValore > tmpValore) {
+                        tmpValore = calcValore;
+                        giocatoreCheHaPreso = Number(key);
+                        //let nome = this.$store.state.giocatori[giocatoreCheHaPreso].Nome
+                        //console.log("prende: " + giocatoreCheHaPreso + " => " + nome);
+                    }
+                }
+
+                //console.log("************      FINE MANO     ****************")
+                return giocatoreCheHaPreso;
+            },
+            getPosizioneFromIdGiocatore(giocatoreCheHaPreso){
+                for(let i = 0; i < 5; i++){
+                    if(this.getGiocatoreInPos(i) === giocatoreCheHaPreso){
+                        //let nome = this.$store.state.giocatori[giocatoreCheHaPreso].Nome
+                        //console.log("########## ha preso il giocatore " + nome + " in posizione => " + i);
+                        return i;
+                    }
+                }
+                return 0;
+/*                 let ret =  idGiocatore-this.me;
+                if(idGiocatore < this.me){
+                    ret = 4 + ret;
+                }
+                
+                return ret; */
             },
             iniziaNuovaMano() {
                 this.mandaMessaggio("iniziaNuovaMano")
