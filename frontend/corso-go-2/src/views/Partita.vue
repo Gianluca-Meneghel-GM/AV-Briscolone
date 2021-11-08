@@ -41,10 +41,22 @@
             </div>
         </v-layout>
         <v-layout style="justify-content: center; height: 24vh">
-            <v-flex xs2><h2 style=" font-style: italic; padding-right: 0.5vh;">Tocca a: </h2><h1 style="color: #4454e3">{{getNomeGiocatore(toccaA)}}</h1></v-flex>
+            <v-flex xs2 style="overflow-y: auto">
+                <section id="log">
+                    <b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Tocca a: </b><b style="font-size: 2vh; color: #6e0021">{{getNomeGiocatore(toccaA)}}</b>
+                    <ul>
+                        <li v-for="logMessage in logMessages" :key="logMessage">
+                            <b v-if="logMessage.chi" style="color: #4454e3">{{logMessage.chi}}</b>
+                            <b :style="logMessage.colorMessage">{{logMessage.azione}}</b>
+                            <b style="color: #4454e3" v-if="logMessage.valore">{{logMessage.valore}}<b style="color: #4454e3" v-if="logMessage.seme"> di {{logMessage.seme}}</b></b>
+                            <b style="font-style: italic; color: #158a42" v-if="logMessage.soprannomeCarta !== undefined && logMessage.soprannomeCarta !== ''">({{logMessage.soprannomeCarta}})</b>
+                        </li>
+                    </ul>
+                </section>
+            </v-flex>
             <v-flex xs8 :style="getStyleGiocatore(0)">
                 <v-layout style="justify-content: center;" ref="box0">
-                    <div v-for="(carta,i) in carte" :key="i">
+                    <div v-for="carta in carte" :key="carta">
                         <v-img :class="{transform: selectedCarta === carta}"
                                 :style="getStyleCarta(carta)"
                                 contain
@@ -55,13 +67,13 @@
                 </v-layout>
             </v-flex>
             <v-flex xs2>                
-                <v-layout v-if="showCartaSocio" style="justify-content: center; font-style: italic"><b>Carta del socio:</b></v-layout>
-                <v-layout v-else style="justify-content: center; font-style: italic"><b>Carta chiamata:</b></v-layout>
+                <v-layout v-if="showCartaSocio" style="justify-content: center"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Carta del socio:</b></v-layout>
+                <v-layout v-else style="justify-content: center"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Carta chiamata:</b></v-layout>
                 <v-layout style="justify-content: center;">
-                    <b style="color: #6e0021">{{cartaChiamata}}</b>
+                    <b style="font-size: 2vh; color: #6e0021">{{cartaChiamata}}</b>
                 </v-layout>
-                <v-layout style="justify-content: center; font-style: italic; padding-right: 0.5vh;" class="mt-4"><b>Chiamante:</b><b style="color: #6e0021">{{getNomeGiocatore(chiamante)}}</b></v-layout>
-                <v-layout style="justify-content: center; font-style: italic; padding-right: 0.5vh;" class="mt-4"><b>Punti per vincere:</b><b style="color: #6e0021">{{puntiVittoria}}</b></v-layout>
+                <v-layout style="justify-content: center" class="mt-4"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Chiamante:</b><b style="font-size: 2vh; color: #6e0021">{{getNomeGiocatore(chiamante)}}</b></v-layout>
+                <v-layout style="justify-content: center" class="mt-4"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Punti per vincere:</b><b style="font-size: 2vh; color: #6e0021">{{puntiVittoria}}</b></v-layout>
             </v-flex>
         </v-layout>
         <v-dialog
@@ -152,7 +164,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="(g,i) in giocatori" :key="i">
+                            <tr v-for="g in giocatori" :key="g.Nome">
                                 <td>{{g.Nome}}</td>
                                 <td>{{g.Partite}}</td>
                                 <td>{{g.Vittorie}}</td>
@@ -220,6 +232,8 @@
             mano: undefined,
             coordGiocatore: undefined,
             haIniziatoIlRound: undefined,
+            logMessages: [],
+            carteCHiamate:[]
         }),
         mounted() {
             this.me = this.$store.state.giocatore.id
@@ -313,7 +327,9 @@
                 this.puntiChiamati = 61
                 this.chiamanteProvvisorio = ''
                 this.puntiDiOggi = {},
-                this.mano = undefined
+                this.mano = undefined,
+                this.logMessages = [],
+                this.carteCHiamate = []
             },
             iniziaPartita(resp) {
                 this.clearVariabili()
@@ -335,6 +351,14 @@
                 this.chiamabili.push("passo")
                 this.valChiamato = resp.ValChiamato
                 this.chiamanteProvvisorio = resp.ChiamanteProvvisorio
+
+                let nomeCarta = this.getNomeCarta(this.valChiamato);
+                if(nomeCarta != undefined && nomeCarta !== 'niente' && this.carteCHiamate.indexOf(this.valChiamato) === -1){
+                    this.carteCHiamate.push(this.valChiamato);
+                    let nomeGiocatore = this.getNomeGiocatore(this.chiamanteProvvisorio);
+                    this.addLogMessage(" ha chiamato ", nomeGiocatore, this.getNomeCarta(this.valChiamato));
+                }
+
                 this.setTurno(resp.ToccaA)
                 if (resp.Chiamante !== -1) {
                     this.chiamante = resp.Chiamante
@@ -371,18 +395,31 @@
                 };
                 this.$store.dispatch("setCarteGiocatori", carte).then( () => {
 
-                    if(resp.CarteGiocate && Object.entries(resp.CarteGiocate).length == 1) {
-                        this.haIniziatoIlRound = this.toccaA;
+                    if(resp.CarteGiocate && Object.keys(resp.CarteGiocate).length == 1) {
+                        this.haIniziatoIlRound = Number(Object.keys(resp.CarteGiocate)[0]); //this.toccaA;
                     }
-
                     this.carteQuestaMano = resp.CarteGiocate
-                    this.setTurno(resp.ToccaA)
+
                     if(this.mano !== resp.Mano){
                         this.mano = resp.Mano;
+                        let manoStr = Number(this.mano) + 1;
+                        this.addLogMessage("Inizio mano: " + manoStr, undefined, undefined, undefined, undefined, "#c24444");
                     }
+
+                    if(this.toccaA != null && this.toccaA !== -1){
+                        let chiHaGiocato = this.$store.state.giocatori[this.toccaA];
+                        if(chiHaGiocato != null && this.carteQuestaMano != null && this.carteQuestaMano[chiHaGiocato.Id]){
+                            let carta = this.carteQuestaMano[chiHaGiocato.Id];
+                            let soprannome = this.carteQuestaMano[chiHaGiocato.Id].Soprannome
+                            this.addLogMessage(" ha giocato ", chiHaGiocato.Nome, this.getNomeCarta(carta.Valore), this.getNomeSeme(carta.SemeStr), soprannome);
+                        }
+                    }
+
+                    this.setTurno(resp.ToccaA)
                     if (resp.Mano === 1) {
                         this.showCartaSocio = true
                     }
+
                     if (this.carteQuestaMano && Object.keys(this.carteQuestaMano).length === 5) {
                         let timeout = 3500;
                         if(this.mano === 0){
@@ -522,13 +559,11 @@
                 }
 
                 //console.log("************      MANO => " + this.mano + "      ****************")
-
                 //console.log("briscola di mano: "+ briscolaMano)
                 for (let key in this.carteQuestaMano) {
                     let valCarta = this.carteQuestaMano[key].Valore;
                     let semeCarta = this.carteQuestaMano[key].SemeStr
                     let calcValore = briscolaMano === semeCarta ? valCarta + 100 : valCarta;
-
                     //console.log("giocatore: " + key + " seme: " + semeCarta + " val: " + valCarta + " => valore calcolato => " + calcValore);
                     if (calcValore > tmpValore) {
                         tmpValore = calcValore;
@@ -537,7 +572,6 @@
                         //console.log("prende: " + giocatoreCheHaPreso + " => " + nome);
                     }
                 }
-
                 //console.log("************      FINE MANO     ****************")
                 return giocatoreCheHaPreso;
             },
@@ -550,12 +584,16 @@
                     }
                 }
                 return 0;
-/*                 let ret =  idGiocatore-this.me;
-                if(idGiocatore < this.me){
-                    ret = 4 + ret;
-                }
-                
-                return ret; */
+            },
+            addLogMessage(azione, chi = undefined, valore = undefined, seme = undefined, soprannomeCarta = undefined, colorMessage = "#000000") {
+                this.logMessages.unshift({
+                    azione: azione,
+                    chi: chi,
+                    valore: valore,
+                    soprannomeCarta: soprannomeCarta,
+                    seme: seme,
+                    colorMessage: "color: " + colorMessage
+                });
             },
             iniziaNuovaMano() {
                 this.mandaMessaggio("iniziaNuovaMano")
@@ -629,8 +667,19 @@
 
 <style scoped>
 
+#log ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#log li {
+  font-size: 1.6vh;
+  margin: 0.3rem 1rem;
+  text-align: left;
+}
+
 .transform {
-  /*transform: translateX(-150px);*/
   animation: slide-scale 0.2s ease-in forwards;
 }
 
@@ -646,6 +695,7 @@
   100% {
     transform: translateY(-25px) scale(1.1);
   }
+  
 }
 
 </style>
