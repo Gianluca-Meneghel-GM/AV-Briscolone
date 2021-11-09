@@ -394,9 +394,8 @@
                     prese: resp.CartePrese
                 };
                 this.$store.dispatch("setCarteGiocatori", carte).then( () => {
-
                     if(resp.CarteGiocate && Object.keys(resp.CarteGiocate).length == 1) {
-                        this.haIniziatoIlRound = Number(Object.keys(resp.CarteGiocate)[0]); //this.toccaA;
+                        this.haIniziatoIlRound = Number(Object.keys(resp.CarteGiocate)[0]);
                     }
                     this.carteQuestaMano = resp.CarteGiocate
 
@@ -409,9 +408,17 @@
                     if(this.toccaA != null && this.toccaA !== -1){
                         let chiHaGiocato = this.$store.state.giocatori[this.toccaA];
                         if(chiHaGiocato != null && this.carteQuestaMano != null && this.carteQuestaMano[chiHaGiocato.Id]){
-                            let carta = this.carteQuestaMano[chiHaGiocato.Id];
-                            let soprannome = this.carteQuestaMano[chiHaGiocato.Id].Soprannome
-                            this.addLogMessage(" ha giocato ", chiHaGiocato.Nome, this.getNomeCarta(carta.Valore), this.getNomeSeme(carta.SemeStr), soprannome);
+                            const carta = this.carteQuestaMano[chiHaGiocato.Id];
+                            const isCoperta = carta.Valore === this.valChiamato && this.mano === 0;
+                            let nomeCarta = this.getNomeCarta(carta.Valore);
+                            let nomeSeme = this.getNomeSeme(carta.SemeStr);
+                            let soprannome = carta.Soprannome;
+                            if(isCoperta){
+                                nomeCarta = nomeCarta + " (coperta)"
+                                nomeSeme = undefined;
+                                soprannome = undefined;
+                            }
+                            this.addLogMessage(" ha giocato ", chiHaGiocato.Nome, nomeCarta, nomeSeme, soprannome);
                         }
                     }
 
@@ -425,6 +432,7 @@
                         if(this.mano === 0){
                             timeout = 5000;
                         }
+                        this.aggiornaCoordGiocatoreCheHaPreso(resp.CarteGiocate);
                         setTimeout(() => this.svuotaTavolo(resp.Mano), timeout)
                     }
                     else {
@@ -493,7 +501,6 @@
                 this.mandaMessaggio("chiamaSeme", [seme.toString()])
             },
             svuotaTavolo(mano) {
-                this.aggiornaCoordGiocatoreCheHaPreso();
                 this.carteQuestaMano = []
                 if (mano === 7) {
                     this.mostraVittoria()
@@ -502,59 +509,64 @@
                     this.iniziaNuovaMano()
                 }
             },
-            aggiornaCoordGiocatoreCheHaPreso(){
+            aggiornaCoordGiocatoreCheHaPreso(carteGiocate){
                 try{
-                    let giocatoreCheHaPreso = this.getGiocatoreCheHaVintoLaMano();
-                    this.haIniziatoIlRound = undefined;
-                    let posizione = this.getPosizioneFromIdGiocatore(giocatoreCheHaPreso);
-                    if(posizione >= 0){
-                        let el;
-                        if(posizione === 0){
-                            el = this.$refs.box0;    
+                    let giocatoreCheHaPreso = this.getGiocatoreCheHaVintoLaMano(carteGiocate);
+                    if(giocatoreCheHaPreso >= 0) {
+                        this.haIniziatoIlRound = undefined;
+                        let posizione = this.getPosizioneFromIdGiocatore(giocatoreCheHaPreso);
+                        if(posizione >= 0){
+                            let el;
+                            if(posizione === 0){
+                                el = this.$refs.box0;    
 
-                        }
-                        else if(posizione === 1){
-                            el = this.$refs.box1.$el;    
-                        }
-                        else if(posizione === 2){
-                            el = this.$refs.box2.$el;  
-                        }
-                        else if(posizione === 3){
-                            el = this.$refs.box3.$el;  
-                        }
-                        else if(posizione === 4){
-                            el = this.$refs.box4.$el;  
-                        }
+                            }
+                            else if(posizione === 1){
+                                el = this.$refs.box1.$el;    
+                            }
+                            else if(posizione === 2){
+                                el = this.$refs.box2.$el;  
+                            }
+                            else if(posizione === 3){
+                                el = this.$refs.box3.$el;  
+                            }
+                            else if(posizione === 4){
+                                el = this.$refs.box4.$el;  
+                            }
 
-                        if(el != undefined){
-                            this.coordGiocatore = {
-                                pos: posizione,
-                                offsetLeft: el.offsetLeft,
-                                offsetTop: el.offsetTop,
-                                width: el.getBoundingClientRect().width,
-                                height: el.getBoundingClientRect().height
+                            if(el != undefined){
+                                this.coordGiocatore = {
+                                    pos: posizione,
+                                    offsetLeft: el.offsetLeft,
+                                    offsetTop: el.offsetTop,
+                                    width: el.getBoundingClientRect().width,
+                                    height: el.getBoundingClientRect().height
+                                }
                             }
                         }
                     }
+/*                     else{
+                        console.log("Impossibile calcolare il giocatore che si è preso la mano..");
+                    } */
                 }
                 catch(e){
                     //console.log(e);
                 }
             },
-            getGiocatoreCheHaVintoLaMano(){
+            getGiocatoreCheHaVintoLaMano(carteGiocate){
                 let giocatoreCheHaPreso = -1;
                 let tmpValore = -1
 
                 let briscolaMano = "";
-                for (let key in this.carteQuestaMano) {
-                    if(this.carteQuestaMano[key].SemeStr === this.briscola){
+                for (let key in carteGiocate) {
+                    if(carteGiocate[key].SemeStr === this.briscola){
                         briscolaMano = this.briscola;
                         break;
                     }
 
                     let idGioc = Number(key);
                     if(idGioc === this.haIniziatoIlRound){
-                        briscolaMano = this.carteQuestaMano[key].SemeStr;
+                        briscolaMano = carteGiocate[key].SemeStr;
                     }
                 }
 
