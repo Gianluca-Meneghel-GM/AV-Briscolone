@@ -85,7 +85,7 @@
                 <v-card-title class="headline lighten-2 pa-3" style="background-color: #DBCFB0">
                     <b>Fase di Chiamata</b>
                     <v-spacer/>
-                    <div v-if="valChiamato !== ''" class="ma-3"> 
+                    <div v-if="getNomeCarta(valChiamato) !== 'niente'" class="ma-3"> 
                         <b style="color: #4454e3">{{getNomeGiocatore(chiamanteProvvisorio)}}</b> ha chiamato: <b style="color: #4454e3">{{getNomeCarta(valChiamato)}}</b>
                     </div>
                 </v-card-title>
@@ -233,7 +233,7 @@
             coordGiocatore: undefined,
             haIniziatoIlRound: undefined,
             logMessages: [],
-            carteCHiamate:[]
+            carteChiamate:[]
         }),
         mounted() {
             this.me = this.$store.state.giocatore.id
@@ -329,7 +329,7 @@
                 this.puntiDiOggi = {},
                 this.mano = undefined,
                 this.logMessages = [],
-                this.carteCHiamate = []
+                this.carteChiamate = []
             },
             iniziaPartita(resp) {
                 this.clearVariabili()
@@ -353,10 +353,18 @@
                 this.chiamanteProvvisorio = resp.ChiamanteProvvisorio
 
                 let nomeCarta = this.getNomeCarta(this.valChiamato);
-                if(nomeCarta != undefined && nomeCarta !== 'niente' && this.carteCHiamate.indexOf(this.valChiamato) === -1){
-                    this.carteCHiamate.push(this.valChiamato);
+                const carteChiamateStr = this.chiamanteProvvisorio + "-"+ this.valChiamato + "-" + this.puntiChiamati;
+                if(nomeCarta != undefined && nomeCarta !== 'niente' && this.carteChiamate.indexOf(carteChiamateStr) === -1) {
+                    this.carteChiamate.push(carteChiamateStr);  //per evitare che lo stesso log venga spammato più volte in chat
                     let nomeGiocatore = this.getNomeGiocatore(this.chiamanteProvvisorio);
-                    this.addLogMessage(" ha chiamato ", nomeGiocatore, this.getNomeCarta(this.valChiamato));
+                    if(this.puntiChiamati > 61){
+                        const punti = this.puntiChiamati - 1;
+                        this.addLogMessage(" ha chiamato ", nomeGiocatore, this.getNomeCarta(this.valChiamato) + " a " + punti);
+                    }
+                    else{
+                        this.addLogMessage(" ha chiamato ", nomeGiocatore, this.getNomeCarta(this.valChiamato));
+                    }
+                    
                 }
 
                 this.setTurno(resp.ToccaA)
