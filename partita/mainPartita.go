@@ -19,8 +19,17 @@ var contoRound = 0
 
 func Init(database *database.SqliteItemsAdapter) {
 	db = database
+	Purge()
 	FaiIlMazzo()
 }
+
+func Purge() {
+	err := db.SvuotaCurrentGiocatori()
+	if err != nil {
+		log.Println("Errore cancellando giocatori correnti: " + err.Error())
+	}
+}
+
 func IscriviBot(id int) {
 	nome := "Bot" + strconv.Itoa(id)
 	_, err := db.SelectGiocatore(nome, 1)
