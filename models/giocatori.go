@@ -26,7 +26,7 @@ type CurrentGiocatore struct {
 func GetGiocatori(db *sqlx.DB) (*[]Giocatore, error) {
 
 	giocatori := []Giocatore{}
-	err := db.Select(&giocatori, `SELECT * FROM giocatori`, nil)
+	err := db.Select(&giocatori, `SELECT * FROM giocatori WHERE nome NOT IN (SELECT nome FROM currentGiocatori)`, nil)
 	if err != nil {
 		return nil, err
 	}
