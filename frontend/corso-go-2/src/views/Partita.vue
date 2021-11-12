@@ -32,14 +32,14 @@
                 </v-layout>
                 <v-layout style="justify-content: center; height:4vh">
                     <div class="ma-3"><b style="font-style: italic; padding-right: 0.5vh;">Prese:</b><b style="color:#4454e3; padding-right: 0.5vh;">{{getPrese(0)}}</b></div>
-                    <v-btn v-if="sonoProntoBtn" class="ma-3" color="#718F94" style="color: white;" @click="sonoPronto()">Sono
-                        pronto
+                    <v-btn v-if="sonoProntoBtn" color="#718F94" style="color: white;" @click="sonoPronto()">Sono
+                    pronto
                     </v-btn>
-                    <v-btn v-if="sommaPunti < 3" class="ma-3" color="#718F94" style="color: white" @click="giocaCarta">a
+                    <v-btn v-if="sommaPunti < 3" color="#718F94" style="color: white" @click="aMonte">a
                         monte
                     </v-btn>
                     <div v-if="toccaAMe">
-                        <v-btn class="ma-3" color="#718F94" style="color: white" @click="giocaCarta">Giocala</v-btn>
+                        <v-btn color="#718F94" style="color: white" @click="giocaCarta">Giocala</v-btn>
                         <!--v-btn class="ma-3" color="#718F94" style="color: white" @click="tuttoNostro">Tutto nostro</v-btn-->
                     </div>
                 </v-layout>
@@ -58,12 +58,13 @@
                         </section>
                     </v-flex>
                     <v-flex xs8 :style="getStyleGiocatore(0)">
-                        <v-layout style="justify-content: center;" ref="box0">
+                        <v-btn v-if="carte.length > 0" color="#718F94" style="color: white; float: right; margin: 5px" @click="toggleCarte">{{getNomePulsanteToggleCarte()}}</v-btn>
+                        <v-layout style="justify-content: center; margin-left: 4vw;" ref="box0">
                             <div v-for="carta in carte" :key="carta">
                                 <v-img :class="{transform: selectedCarta === carta}"
                                         :style="getStyleCarta(carta)"
                                         contain
-                                        :src="require(`../assets/${$store.state.mazzo}/${carta.Valore + carta.SemeStr}.png`)"
+                                        :src="getSpriteCartaGiocatore(carta)"
                                         @click="toggleSelection(carta)"
                                 ></v-img>
                             </div>
@@ -246,7 +247,8 @@
             logMessages: [],
             carteChiamate:[],
             logChat: [],
-            abilitaChat: false
+            abilitaChat: false,
+            carteVisibili: true
         }),
         mounted() {
             this.me = this.$store.state.giocatore.id
@@ -677,6 +679,28 @@
                     }
                     this.selectedCarta = {}
                 }
+            },
+            toggleCarte(){
+                this.carteVisibili = !this.carteVisibili
+            },
+            getNomePulsanteToggleCarte(){
+                if(this.carteVisibili){
+                    return 'Nascondi';
+                }
+                else{
+                    return 'Mostra';
+                }
+            },
+            getSpriteCartaGiocatore(carta){
+                if(this.carteVisibili){
+                    return require(`../assets/${this.$store.state.mazzo}/${carta.Valore + carta.SemeStr}.png`);
+                }
+                else{
+                    return require(`../assets/${this.$store.state.mazzo}/retro.png`);
+                }
+            },
+            aMonte(){
+                
             },
             tuttoNostro() {
 

@@ -10,6 +10,7 @@
                     dark
                     style="white-space: normal;"
                     class="ma-2"
+                    large
                     >
                     <v-icon left>
                     mdi-account-circle-outline
