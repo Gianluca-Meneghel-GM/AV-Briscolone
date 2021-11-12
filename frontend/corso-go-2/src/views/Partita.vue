@@ -32,14 +32,14 @@
                 </v-layout>
                 <v-layout style="justify-content: center; height:4vh">
                     <div class="ma-3"><b style="font-style: italic; padding-right: 0.5vh;">Prese:</b><b style="color:#4454e3; padding-right: 0.5vh;">{{getPrese(0)}}</b></div>
-                    <v-btn v-if="sonoProntoBtn" color="#718F94" style="color: white;" @click="sonoPronto()">Sono
+                    <v-btn v-if="sonoProntoBtn" class="ma-3" color="#718F94" style="color: white;" @click="sonoPronto()">Sono
                     pronto
                     </v-btn>
-                    <v-btn v-if="sommaPunti < 3" color="#718F94" style="color: white" @click="aMonte">a
+                    <v-btn v-if="sommaPunti < 3" class="ma-3" color="#718F94" style="color: white" @click="aMonte">a
                         monte
                     </v-btn>
                     <div v-if="toccaAMe">
-                        <v-btn color="#718F94" style="color: white" @click="giocaCarta">Giocala</v-btn>
+                        <v-btn color="#718F94" class="ma-3" style="color: white" @click="giocaCarta">Giocala</v-btn>
                         <!--v-btn class="ma-3" color="#718F94" style="color: white" @click="tuttoNostro">Tutto nostro</v-btn-->
                     </div>
                 </v-layout>
@@ -58,7 +58,7 @@
                         </section>
                     </v-flex>
                     <v-flex xs8 :style="getStyleGiocatore(0)">
-                        <v-btn v-if="carte.length > 0" color="#718F94" style="color: white; float: right; margin: 5px" @click="toggleCarte">{{getNomePulsanteToggleCarte()}}</v-btn>
+                        <v-btn class="ma-3" v-if="carte.length > 0" color="#718F94" style="color: white; float: right; margin: 5px" @click="toggleCarte">{{getNomePulsanteToggleCarte()}}</v-btn>
                         <v-layout style="justify-content: center; margin-left: 4vw;" ref="box0">
                             <div v-for="carta in carte" :key="carta">
                                 <v-img :class="{transform: selectedCarta === carta}"
