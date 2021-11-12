@@ -54,6 +54,12 @@ type iniziaRoundResp struct {
 	Briscola string
 }
 
+type messaggioChatResp struct {
+	Azione    string
+	Giocatore int
+	Messaggio string
+}
+
 func setResponse(w http.ResponseWriter, body interface{}, statusCode int) {
 	if statusCode != http.StatusOK {
 		w.WriteHeader(statusCode)

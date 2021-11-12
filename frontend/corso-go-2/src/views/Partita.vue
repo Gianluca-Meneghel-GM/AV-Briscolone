@@ -18,64 +18,73 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-layout style="height:18vh;">
-            <box-giocatore ref="box3" :pos="3" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
-            <box-giocatore ref="box2" :pos="2" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
-        </v-layout>
-        <v-layout style="height:45vh">
-            <box-giocatore ref="box4" :pos="4" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
-            <tavolo :coordGiocatore="coordGiocatore" :mano="mano" :valChiamato="valChiamato" :carteQuestaMano="carteQuestaMano"></tavolo>
-            <box-giocatore ref="box1" :pos="1" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
-        </v-layout>
-        <v-layout style="justify-content: center; height:4vh">
-            <div class="ma-3"><b style="font-style: italic; padding-right: 0.5vh;">Prese:</b><b style="color:#4454e3; padding-right: 0.5vh;">{{getPrese(0)}}</b></div>
-            <v-btn v-if="sonoProntoBtn" class="ma-3" color="#718F94" style="color: white;" @click="sonoPronto()">Sono
-                pronto
-            </v-btn>
-            <v-btn v-if="sommaPunti < 3" class="ma-3" color="#718F94" style="color: white" @click="giocaCarta">a
-                monte
-            </v-btn>
-            <div v-if="toccaAMe">
-                <v-btn class="ma-3" color="#718F94" style="color: white" @click="giocaCarta">Giocala</v-btn>
-                <!--v-btn class="ma-3" color="#718F94" style="color: white" @click="tuttoNostro">Tutto nostro</v-btn-->
-            </div>
-        </v-layout>
-        <v-layout style="justify-content: center; height: 24vh">
-            <v-flex xs2 style="overflow-y: auto">
-                <section id="log">
-                    <b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Tocca a: </b><b style="font-size: 2vh; color: #6e0021">{{getNomeGiocatore(toccaA)}}</b>
-                    <ul>
-                        <li v-for="logMessage in logMessages" :key="logMessage">
-                            <b v-if="logMessage.chi" style="color: #4454e3">{{logMessage.chi}}</b>
-                            <b :style="logMessage.colorMessage">{{logMessage.azione}}</b>
-                            <b style="color: #4454e3" v-if="logMessage.valore">{{logMessage.valore}}<b style="color: #4454e3" v-if="logMessage.seme"> di {{logMessage.seme}}</b></b>
-                            <b style="font-style: italic; color: #158a42" v-if="logMessage.soprannomeCarta !== undefined && logMessage.soprannomeCarta !== ''">({{logMessage.soprannomeCarta}})</b>
-                        </li>
-                    </ul>
-                </section>
-            </v-flex>
-            <v-flex xs8 :style="getStyleGiocatore(0)">
-                <v-layout style="justify-content: center;" ref="box0">
-                    <div v-for="carta in carte" :key="carta">
-                        <v-img :class="{transform: selectedCarta === carta}"
-                                :style="getStyleCarta(carta)"
-                                contain
-                                :src="require(`../assets/${$store.state.mazzo}/${carta.Valore + carta.SemeStr}.png`)"
-                                @click="toggleSelection(carta)"
-                        ></v-img>
+
+        <v-row class="board">
+            <v-col md="10">
+                <v-layout style="height:18vh;">
+                    <box-giocatore ref="box3" :pos="3" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
+                    <box-giocatore ref="box2" :pos="2" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
+                </v-layout>
+                <v-layout style="height:45vh">
+                    <box-giocatore ref="box4" :pos="4" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
+                    <tavolo :coordGiocatore="coordGiocatore" :mano="mano" :valChiamato="valChiamato" :carteQuestaMano="carteQuestaMano"></tavolo>
+                    <box-giocatore ref="box1" :pos="1" :toccaA="toccaA" :chiamante="chiamante"></box-giocatore>
+                </v-layout>
+                <v-layout style="justify-content: center; height:4vh">
+                    <div class="ma-3"><b style="font-style: italic; padding-right: 0.5vh;">Prese:</b><b style="color:#4454e3; padding-right: 0.5vh;">{{getPrese(0)}}</b></div>
+                    <v-btn v-if="sonoProntoBtn" class="ma-3" color="#718F94" style="color: white;" @click="sonoPronto()">Sono
+                        pronto
+                    </v-btn>
+                    <v-btn v-if="sommaPunti < 3" class="ma-3" color="#718F94" style="color: white" @click="giocaCarta">a
+                        monte
+                    </v-btn>
+                    <div v-if="toccaAMe">
+                        <v-btn class="ma-3" color="#718F94" style="color: white" @click="giocaCarta">Giocala</v-btn>
+                        <!--v-btn class="ma-3" color="#718F94" style="color: white" @click="tuttoNostro">Tutto nostro</v-btn-->
                     </div>
                 </v-layout>
-            </v-flex>
-            <v-flex xs2>                
-                <v-layout v-if="showCartaSocio" style="justify-content: center"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Carta del socio:</b></v-layout>
-                <v-layout v-else style="justify-content: center"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Carta chiamata:</b></v-layout>
-                <v-layout style="justify-content: center;">
-                    <b style="font-size: 2vh; color: #6e0021">{{cartaChiamata}}</b>
+                <v-layout style="justify-content: center; height: 24vh">
+                    <v-flex xs2 style="overflow-y: auto">
+                        <section id="log">
+                            <b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Tocca a: </b><b style="font-size: 2vh; color: #6e0021">{{getNomeGiocatore(toccaA)}}</b>
+                            <ul>
+                                <li v-for="logMessage in logMessages" :key="logMessage">
+                                    <b v-if="logMessage.chi" style="color: #4454e3">{{logMessage.chi}}</b>
+                                    <b :style="logMessage.colorMessage">{{logMessage.azione}}</b>
+                                    <b style="color: #4454e3" v-if="logMessage.valore">{{logMessage.valore}}<b style="color: #4454e3" v-if="logMessage.seme"> di {{logMessage.seme}}</b></b>
+                                    <b style="font-style: italic; color: #158a42" v-if="logMessage.soprannomeCarta !== undefined && logMessage.soprannomeCarta !== ''">({{logMessage.soprannomeCarta}})</b>
+                                </li>
+                            </ul>
+                        </section>
+                    </v-flex>
+                    <v-flex xs8 :style="getStyleGiocatore(0)">
+                        <v-layout style="justify-content: center;" ref="box0">
+                            <div v-for="carta in carte" :key="carta">
+                                <v-img :class="{transform: selectedCarta === carta}"
+                                        :style="getStyleCarta(carta)"
+                                        contain
+                                        :src="require(`../assets/${$store.state.mazzo}/${carta.Valore + carta.SemeStr}.png`)"
+                                        @click="toggleSelection(carta)"
+                                ></v-img>
+                            </div>
+                        </v-layout>
+                    </v-flex>
+                    <v-flex xs2>                
+                        <v-layout v-if="showCartaSocio" style="justify-content: center"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Carta del socio:</b></v-layout>
+                        <v-layout v-else style="justify-content: center"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Carta chiamata:</b></v-layout>
+                        <v-layout style="justify-content: center;">
+                            <b style="font-size: 2vh; color: #6e0021">{{cartaChiamata}}</b>
+                        </v-layout>
+                        <v-layout style="justify-content: center" class="mt-4"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Chiamante:</b><b style="font-size: 2vh; color: #6e0021">{{getNomeGiocatore(chiamante)}}</b></v-layout>
+                        <v-layout style="justify-content: center" class="mt-4"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Punti per vincere:</b><b style="font-size: 2vh; color: #6e0021">{{puntiVittoria}}</b></v-layout>
+                    </v-flex>
                 </v-layout>
-                <v-layout style="justify-content: center" class="mt-4"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Chiamante:</b><b style="font-size: 2vh; color: #6e0021">{{getNomeGiocatore(chiamante)}}</b></v-layout>
-                <v-layout style="justify-content: center" class="mt-4"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Punti per vincere:</b><b style="font-size: 2vh; color: #6e0021">{{puntiVittoria}}</b></v-layout>
-            </v-flex>
-        </v-layout>
+            </v-col>
+            <v-col md="2">
+                <the-chat :enabled="abilitaChat" :myName="getNomeGiocatore(me)" :logChat="logChat" @mandaMessaggioChat="mandaMessaggioChat"></the-chat>
+            </v-col>
+        </v-row>
+
         <v-dialog
                 v-model="chiamaDialog"
                 width="400"
@@ -193,12 +202,14 @@
     import partitaApi from "../api/partitaApi";
     import BoxGiocatore from "../components/BoxGiocatore.vue"
     import Tavolo from '../components/Tavolo.vue'
+    import TheChat from '../components/TheChat.vue'
 
     export default {
         name: "Partita",
         components:{
             BoxGiocatore,
-            Tavolo
+            Tavolo,
+            TheChat
         },
         data: () => ({
             ws: {},
@@ -233,7 +244,9 @@
             coordGiocatore: undefined,
             haIniziatoIlRound: undefined,
             logMessages: [],
-            carteChiamate:[]
+            carteChiamate:[],
+            logChat: [],
+            abilitaChat: false
         }),
         mounted() {
             this.me = this.$store.state.giocatore.id
@@ -263,7 +276,6 @@
                 let messaggio = {azione: azione, mittente: this.me, params: params}
                 let json = JSON.stringify(messaggio)
                 this.ws.send(json)
-                //console.log("mandato " + json)
             },
             registerWebSocket(id) {
                 var currentLocation = window.location;
@@ -301,6 +313,9 @@
                         case "finePartita":
                             this.finePartita(messaggio)
                             break
+                        case "showMessaggioChat":
+                            this.showMessaggioChat(messaggio)
+                            break
                     }
                 }
             },
@@ -329,7 +344,8 @@
                 this.puntiDiOggi = {},
                 this.mano = undefined,
                 this.logMessages = [],
-                this.carteChiamate = []
+                this.carteChiamate = [],
+                this.logChat = []
             },
             iniziaPartita(resp) {
                 this.clearVariabili()
@@ -337,6 +353,7 @@
                 this.$store.dispatch('setGiocatori', resp.CurrentGiocatori)
                 this.setTurno(resp.ToccaA)
                 this.chiamaDialog = true
+                this.abilitaChat = true
             },
             setChiamabili(resp) {
                 this.showChiamaAPuntiBox = false
@@ -614,6 +631,20 @@
                     seme: seme,
                     colorMessage: "color: " + colorMessage
                 });
+            },
+            showMessaggioChat(resp){
+                let nome = this.getNomeGiocatore(resp.Giocatore);
+                let isMe = this.me === resp.Giocatore;
+                this.logChat.unshift({
+                    id: this.logChat.length,
+                    chi: nome,
+                    messaggio: resp.Messaggio,
+                    me: isMe,
+                    timestamp: new Date().toLocaleTimeString()
+                });
+            },
+            mandaMessaggioChat(messaggio) {
+                this.mandaMessaggio("mandaMessaggioChat", [messaggio]);
             },
             iniziaNuovaMano() {
                 this.mandaMessaggio("iniziaNuovaMano")

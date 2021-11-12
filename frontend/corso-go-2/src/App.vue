@@ -1,5 +1,5 @@
 <template>
-  <v-app id="inspire" style="overflow-y: auto">
+  <v-app id="inspire" style="overflow: hidden">
     <v-app-bar
             app
             clipped-right

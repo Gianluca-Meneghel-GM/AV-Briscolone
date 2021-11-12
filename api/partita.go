@@ -72,6 +72,12 @@ func chiamaValoreHandler(mex messaggioDaClient) {
 		ValChiamato: valChiamato, PuntiVittoria: puntiPerVittoria, ChiamanteProvvisorio: chiamanteProvvisorio})
 }
 
+func messaggioChatHandler(mex messaggioDaClient) {
+	giocatore := mex.Mittente
+	messaggioChat := mex.Params[0]
+	broadcast(messaggioChatResp{Azione: "showMessaggioChat", Giocatore: giocatore, Messaggio: messaggioChat})
+}
+
 func chiamaBotHandler() {
 	toccaA := partita.GetAChiToccaChiamare()
 	chiamaValoreHandler(messaggioDaClient{Mittente: toccaA, Params: []string{"passo", "61"}})

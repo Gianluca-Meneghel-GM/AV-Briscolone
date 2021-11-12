@@ -57,6 +57,8 @@ func ascolta(conn *websocket.Conn) {
 			altroRoundHandler(messaggio)
 		case "bastaCosì":
 			bastaCosiHandler()
+		case "mandaMessaggioChat":
+			messaggioChatHandler(messaggio)
 		}
 
 	}
