@@ -47,38 +47,11 @@
                     <v-flex xs2 style="overflow-y: auto">
                         <section id="log">
                             <b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Tocca a: </b><b style="font-size: 2vh; color: #6e0021">{{getNomeGiocatore(toccaA)}}</b>
-                            <ul>
-                                <li v-for="logMessage in logMessages" :key="logMessage">
-                                    <b v-if="logMessage.chi" style="color: #4454e3">{{logMessage.chi}}</b>
-                                    <b :style="logMessage.colorMessage">{{logMessage.azione}}</b>
-                                    <b style="color: #4454e3" v-if="logMessage.valore">{{logMessage.valore}}<b style="color: #4454e3" v-if="logMessage.seme"> di {{logMessage.seme}}</b></b>
-                                    <b style="font-style: italic; color: #158a42" v-if="logMessage.soprannomeCarta !== undefined && logMessage.soprannomeCarta !== ''">({{logMessage.soprannomeCarta}})</b>
-                                </li>
-                            </ul>
+                            <the-logs :logMessages="logMessages"></the-logs>
                         </section>
                     </v-flex>
-                    <v-flex xs8 :style="getStyleGiocatore(0)">
-                        <v-btn class="ma-3" v-if="carte.length > 0" color="#718F94" style="color: white; float: right; margin: 5px" @click="toggleCarte">{{getNomePulsanteToggleCarte()}}</v-btn>
-                        <v-layout style="justify-content: center; margin-left: 4vw;" ref="box0">
-                            <div v-for="carta in carte" :key="carta">
-                                <v-img :class="{transform: selectedCarta === carta}"
-                                        :style="getStyleCarta(carta)"
-                                        contain
-                                        :src="getSpriteCartaGiocatore(carta)"
-                                        @click="toggleSelection(carta)"
-                                ></v-img>
-                            </div>
-                        </v-layout>
-                    </v-flex>
-                    <v-flex xs2>                
-                        <v-layout v-if="showCartaSocio" style="justify-content: center"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Carta del socio:</b></v-layout>
-                        <v-layout v-else style="justify-content: center"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Carta chiamata:</b></v-layout>
-                        <v-layout style="justify-content: center;">
-                            <b style="font-size: 2vh; color: #6e0021">{{cartaChiamata}}</b>
-                        </v-layout>
-                        <v-layout style="justify-content: center" class="mt-4"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Chiamante:</b><b style="font-size: 2vh; color: #6e0021">{{getNomeGiocatore(chiamante)}}</b></v-layout>
-                        <v-layout style="justify-content: center" class="mt-4"><b style="font-size: 2vh; font-style: italic; padding-right: 0.5vh;">Punti per vincere:</b><b style="font-size: 2vh; color: #6e0021">{{puntiVittoria}}</b></v-layout>
-                    </v-flex>
+                    <pannello-carte-giocatore ref="box0" :carte="carte" :toccaA="toccaA" :chiamante="chiamante" :selectedCarta="selectedCarta" @cartaSelected="cartaSelected"></pannello-carte-giocatore>
+                    <informazioni-chiamante :showCartaSocio="showCartaSocio" :cartaChiamata="cartaChiamata" :puntiVittoria="puntiVittoria" :chiamante="getNomeGiocatore(chiamante)"></informazioni-chiamante>
                 </v-layout>
             </v-col>
             <v-col md="2">
@@ -204,13 +177,19 @@
     import BoxGiocatore from "../components/BoxGiocatore.vue"
     import Tavolo from '../components/Tavolo.vue'
     import TheChat from '../components/TheChat.vue'
+    import TheLogs from '../components/TheLogs.vue'
+    import PannelloCarteGiocatore from "../components/PannelloCarteGiocatore.vue";
+    import InformazioniChiamante from "../components/InformazioniChiamante.vue";
 
     export default {
         name: "Partita",
         components:{
             BoxGiocatore,
             Tavolo,
-            TheChat
+            TheChat,
+            TheLogs,
+            PannelloCarteGiocatore,
+            InformazioniChiamante
         },
         data: () => ({
             ws: {},
@@ -247,8 +226,7 @@
             logMessages: [],
             carteChiamate:[],
             logChat: [],
-            abilitaChat: false,
-            carteVisibili: true
+            abilitaChat: false
         }),
         mounted() {
             this.me = this.$store.state.giocatore.id
@@ -470,16 +448,6 @@
                     this.$forceUpdate()
                 });
             },
-            getStyleCarta(carta) {
-                let border = "border: ;"
-                if (carta.isSelected) {
-                    border += "border: 5px solid #24ccf2;"
-                }
-                return "width: 8vh; margin-top: 30px; margin-left: 2px; margin-right: 2px; margin-bottom: 5px;" + border
-            },
-            getStyleGiocatore(pos) {
-                return this.$store.getters.getStyleGiocatore(pos, this.toccaA, this.chiamante);
-            },
             getNomeCarta(val) {
                 switch (val) {
                     case 30:
@@ -511,16 +479,6 @@
                         return "Spade"
                 }
             },
-            toggleSelection(carta) {
-                if (this.toccaAMe) {
-                    for (let i = 0; i < this.carte.length; i++) {
-                        this.carte[i].isSelected = false
-                    }
-                    carta.isSelected = true
-                    this.selectedCarta = carta
-                    this.$forceUpdate()
-                }
-            },
             getNomeGiocatore(id) {
                 return this.$store.state.giocatori[id] ? this.$store.state.giocatori[id].Nome : ''
             },
@@ -545,7 +503,7 @@
                         if(posizione >= 0){
                             let el;
                             if(posizione === 0){
-                                el = this.$refs.box0;    
+                                el = this.$refs.box0.$el;    
 
                             }
                             else if(posizione === 1){
@@ -680,23 +638,14 @@
                     this.selectedCarta = {}
                 }
             },
-            toggleCarte(){
-                this.carteVisibili = !this.carteVisibili
-            },
-            getNomePulsanteToggleCarte(){
-                if(this.carteVisibili){
-                    return 'Nascondi';
-                }
-                else{
-                    return 'Mostra';
-                }
-            },
-            getSpriteCartaGiocatore(carta){
-                if(this.carteVisibili){
-                    return require(`../assets/${this.$store.state.mazzo}/${carta.Valore + carta.SemeStr}.png`);
-                }
-                else{
-                    return require(`../assets/${this.$store.state.mazzo}/retro.png`);
+            cartaSelected(carta){
+                if (this.toccaAMe) {
+                    for (let i = 0; i < this.carte.length; i++) {
+                        this.carte[i].isSelected = false
+                    }
+                    carta.isSelected = true
+                    this.selectedCarta = carta
+                    this.$forceUpdate()
                 }
             },
             aMonte(){
@@ -739,38 +688,3 @@
         }
     }
 </script>
-
-<style scoped>
-
-#log ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-#log li {
-  font-size: 1.6vh;
-  margin: 0.3rem 1rem;
-  text-align: left;
-}
-
-.transform {
-  animation: slide-scale 0.2s ease-in forwards;
-}
-
-@keyframes slide-scale{
-  0% {
-    transform: translateY(0) scale(1);
-  }
-
-  70% {
-    transform: translateY(-15px) scale(1.05);
-  }
-
-  100% {
-    transform: translateY(-25px) scale(1.1);
-  }
-  
-}
-
-</style>
