@@ -75,7 +75,7 @@
                 <v-card-text style="text-align: center; background-color: #90B494">
                     <div v-if="chiamante === ''">
                         <v-btn class="ma-3" v-for="val in chiamabili" :disabled="!toccaAMe" :key="val"
-                               @click="mandaMessaggio('chiamaValore', [val.toString(), puntiChiamati.toString()])">
+                               @click="chiamaCarta(val, puntiChiamati)">
                             {{getNomeCarta(val)}}
                         </v-btn>
                         <div v-if="showChiamaAPuntiBox" style="text-align: -webkit-center">
@@ -193,7 +193,7 @@
         },
         data: () => ({
             ws: {},
-            me: 0,
+            me: undefined,
             notYetDialog: false,
             chiamaDialog: false,
             vittoriaDialog: false,
@@ -482,6 +482,9 @@
             getNomeGiocatore(id) {
                 return this.$store.state.giocatori[id] ? this.$store.state.giocatori[id].Nome : ''
             },
+            chiamaCarta(val, puntiChiamati){
+                this.mandaMessaggio('chiamaValore', [val.toString(), puntiChiamati.toString()])
+            },
             chiamaSeme(seme) {
                 this.mandaMessaggio("chiamaSeme", [seme.toString()])
             },
@@ -655,7 +658,6 @@
 
             },
             getGiocatoreInPos(pos) {
-                //return ((this.me + pos) % 5)
                 return this.$store.getters.getGiocatoreInPos(pos);
             },
             setBots() {
