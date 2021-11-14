@@ -43,7 +43,9 @@ func chiamaValoreHandler(mex messaggioDaClient) {
 	puntiChiamatiStr := mex.Params[1]
 	chiamanteProvvisorio := partita.GetChiamanteProvvisorio()
 	partita.AumentaAChiToccaChiamare()
+	haPassato := -1
 	if valoreStr == "passo" {
+		haPassato = giocatore
 		inChiamata := partita.PassaChiamata(giocatore)
 		if len(inChiamata) == 1 {
 			partita.SetChiamante(inChiamata[0])
@@ -69,7 +71,7 @@ func chiamaValoreHandler(mex messaggioDaClient) {
 	valChiamato := partita.GetValChiamato()
 	puntiPerVittoria := partita.GetPuntiVittoria()
 	broadcast(setChiamabiliResp{Azione: "setChiamabili", Chiamabili: chiamabili, ToccaA: toccaA, Chiamante: chiamante,
-		ValChiamato: valChiamato, PuntiVittoria: puntiPerVittoria, ChiamanteProvvisorio: chiamanteProvvisorio})
+		ValChiamato: valChiamato, PuntiVittoria: puntiPerVittoria, ChiamanteProvvisorio: chiamanteProvvisorio, HaPassato: haPassato})
 }
 
 func messaggioChatHandler(mex messaggioDaClient) {

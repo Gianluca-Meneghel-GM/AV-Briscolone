@@ -363,6 +363,10 @@
                     }
                     
                 }
+                if(resp.HaPassato !== -1 && resp.ValChiamato !==  0) {
+                    const nomeGiocatore = this.getNomeGiocatore(resp.HaPassato);
+                    this.addLogMessage(" ha passato ", nomeGiocatore);
+                }
 
                 this.setTurno(resp.ToccaA)
                 if (resp.Chiamante !== -1) {
@@ -662,9 +666,6 @@
             },
             setBots() {
                 this.mandaMessaggio("addBots")
-            },
-            chiamaCartaBot(id) {
-                partitaApi.chiamaBot(id)
             },
             giocaCartaBot(id) {
                 setTimeout(() => this.mandaMessaggioBot(id), 1000)

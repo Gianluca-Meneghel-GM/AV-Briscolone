@@ -32,6 +32,7 @@ type setChiamabiliResp struct {
 	ChiamanteProvvisorio int
 	ValChiamato          int
 	PuntiVittoria        int
+	HaPassato            int
 }
 
 type setGiocataResp struct {
