@@ -6,7 +6,7 @@
     >
         <v-img
                 v-if="haGiocato()"
-                style="width: 9vh; margin: 5px"
+                style="width: 9vh; margin: 5px; border-radius: 3%; box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.2), 10px 10px 20px 0 rgba(0, 0, 0, 0.19);"
                 contain
                 v-bind:src="getSpriteCarta()"
         ></v-img>
@@ -26,7 +26,7 @@ import Velocity from 'velocity-animate'
                 return false
             },
             getSpriteCarta() {
-                let carta = this.getCartaQuestaMano(this.pos);
+                let carta = this.getCartaQuestaMano();
                 if (this.isCartaCoperta()) {
                     return require(`../assets/${this.$store.state.mazzo}/retro.png`)
                 }
@@ -43,7 +43,7 @@ import Velocity from 'velocity-animate'
                 return this.$store.getters.getGiocatoreInPos(this.pos);
             },
             isCartaCoperta(){
-                let carta = this.getCartaQuestaMano(this.pos)
+                let carta = this.getCartaQuestaMano()
                 return carta.Valore === this.valChiamato && this.mano === 0 && this.carteQuestaMano && Object.keys(this.carteQuestaMano).length < 5;
             },
             beforeLeave(el){

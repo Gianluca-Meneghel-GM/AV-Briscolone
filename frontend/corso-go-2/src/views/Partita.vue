@@ -68,15 +68,15 @@
                 <v-card-title class="headline lighten-2 pa-3" style="background-color: #DBCFB0">
                     <b>Fase di Chiamata</b>
                     <v-spacer/>
-                    <div v-if="getNomeCarta(valChiamato) !== 'niente'" class="ma-3"> 
-                        <b style="color: #4454e3">{{getNomeGiocatore(chiamanteProvvisorio)}}</b> ha chiamato: <b style="color: #4454e3">{{getNomeCarta(valChiamato)}}</b>
+                    <div v-if="getValoreCarta(valChiamato) !== 'niente'" class="ma-3"> 
+                        <b style="color: #4454e3">{{getNomeGiocatore(chiamanteProvvisorio)}}</b> ha chiamato: <b style="color: #4454e3">{{getValoreCarta(valChiamato)}}</b>
                     </div>
                 </v-card-title>
                 <v-card-text style="text-align: center; background-color: #90B494">
                     <div v-if="chiamante === ''">
                         <v-btn class="ma-3" v-for="val in chiamabili" :disabled="!toccaAMe" :key="val"
                                @click="chiamaCarta(val, puntiChiamati)">
-                            {{getNomeCarta(val)}}
+                            {{getValoreCarta(val)}}
                         </v-btn>
                         <div v-if="showChiamaAPuntiBox" style="text-align: -webkit-center">
                             <v-text-field label="chiama a punti" type="number" :min="puntiChiamati"
@@ -244,7 +244,7 @@
                 return punti
             },
             cartaChiamata(){
-                let val = this.getNomeCarta(this.valChiamato);
+                let val = this.getValoreCarta(this.valChiamato);
                 if(this.showCartaSocio){
                     val = val + ' di ' + this.getNomeSeme(this.briscola)
                 }
@@ -324,8 +324,7 @@
                 this.puntiDiOggi = {},
                 this.mano = undefined,
                 this.logMessages = [],
-                this.carteChiamate = [],
-                this.logChat = []
+                this.carteChiamate = []
             },
             iniziaPartita(resp) {
                 this.clearVariabili()
@@ -349,17 +348,17 @@
                 this.valChiamato = resp.ValChiamato
                 this.chiamanteProvvisorio = resp.ChiamanteProvvisorio
 
-                let nomeCarta = this.getNomeCarta(this.valChiamato);
+                let nomeCarta = this.getValoreCarta(this.valChiamato);
                 const carteChiamateStr = this.chiamanteProvvisorio + "-"+ this.valChiamato + "-" + this.puntiChiamati;
                 if(nomeCarta != undefined && nomeCarta !== 'niente' && this.carteChiamate.indexOf(carteChiamateStr) === -1) {
                     this.carteChiamate.push(carteChiamateStr);  //per evitare che lo stesso log venga spammato più volte in chat
                     let nomeGiocatore = this.getNomeGiocatore(this.chiamanteProvvisorio);
                     if(this.puntiChiamati > 61){
                         const punti = this.puntiChiamati - 1;
-                        this.addLogMessage(" ha chiamato ", nomeGiocatore, this.getNomeCarta(this.valChiamato) + " a " + punti);
+                        this.addLogMessage(" ha chiamato ", nomeGiocatore, this.getValoreCarta(this.valChiamato) + " a " + punti);
                     }
                     else{
-                        this.addLogMessage(" ha chiamato ", nomeGiocatore, this.getNomeCarta(this.valChiamato));
+                        this.addLogMessage(" ha chiamato ", nomeGiocatore, this.getValoreCarta(this.valChiamato));
                     }
                     
                 }
@@ -419,7 +418,7 @@
                         if(chiHaGiocato != null && this.carteQuestaMano != null && this.carteQuestaMano[chiHaGiocato.Id]){
                             const carta = this.carteQuestaMano[chiHaGiocato.Id];
                             const isCoperta = carta.Valore === this.valChiamato && this.mano === 0;
-                            let nomeCarta = this.getNomeCarta(carta.Valore);
+                            let nomeCarta = this.getValoreCarta(carta.Valore);
                             let nomeSeme = this.getNomeSeme(carta.SemeStr);
                             let soprannome = carta.Soprannome;
                             if(isCoperta){
@@ -452,36 +451,11 @@
                     this.$forceUpdate()
                 });
             },
-            getNomeCarta(val) {
-                switch (val) {
-                    case 30:
-                    case 0:
-                        return 'niente'
-                    case 21:
-                        return 'Asso';
-                    case 13:
-                        return 'Tre';
-                    case 10:
-                        return 'Re';
-                    case 9:
-                        return 'Cavallo';
-                    case 8:
-                        return 'Fante';
-                    default:
-                        return val;
-                }
+            getValoreCarta(val) {
+                return this.$store.getters.getValoreCarta(val);
             },
             getNomeSeme(seme) {
-                switch (seme) {
-                    case "B":
-                        return "Bastoni"
-                    case "C":
-                        return "Coppe"
-                    case "D":
-                        return "Denari"
-                    case "S":
-                        return "Spade"
-                }
+                return this.$store.getters.getNomeSeme(seme);
             },
             getNomeGiocatore(id) {
                 return this.$store.state.giocatori[id] ? this.$store.state.giocatori[id].Nome : ''

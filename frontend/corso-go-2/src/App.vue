@@ -49,11 +49,11 @@
     },
     data: () => ({
       selectedMazzo: 'brescia',
-      mazzi: ['Brescia', 'Bergamo', 'Milano', 'Napoli']
+      mazzi: ['Brescia', 'Bergamo', 'Milano', 'Napoli', 'Alpini']
     }),
     computed: {
       header () {
-        return this.$store.state.giocatore.nome ? this.$store.state.giocatore.nome + ' (Giocatore ' + this.$store.state.giocatore.id + ')' : 'Salve'
+        return this.$store.state.giocatore.nome ? this.$store.state.giocatore.nome : 'Salve'
       }
     },
     methods: {

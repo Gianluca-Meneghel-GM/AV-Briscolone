@@ -41,7 +41,41 @@ export default new Vuex.Store({
         },
         getGiocatoreInPos: (state) => (pos) => {
             return ((state.giocatore.id + pos) % 5)
-        }
+        },
+        getValoreCarta: () => (val) =>  {
+            switch (val) {
+                case 30:
+                case 0:
+                    return 'niente'
+                case 21:
+                    return 'Asso';
+                case 13:
+                    return 'Tre';
+                case 10:
+                    return 'Re';
+                case 9:
+                    return 'Cavallo';
+                case 8:
+                    return 'Fante';
+                default:
+                    return val;
+            }
+        },
+        getNomeSeme: () => (seme) => {
+            switch (seme) {
+                case "B":
+                    return "Bastoni"
+                case "C":
+                    return "Coppe"
+                case "D":
+                    return "Denari"
+                case "S":
+                    return "Spade"
+            }
+        },
+        getNomeCarta: (_, getters) => (carta) => {
+            return getters.getValoreCarta(carta.Valore) + ' di ' + getters.getNomeSeme(carta.SemeStr);
+        },
     },
     mutations: {
         SetGiocatore(state, giocatore) {
