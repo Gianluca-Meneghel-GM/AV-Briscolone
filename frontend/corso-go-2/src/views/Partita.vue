@@ -35,9 +35,6 @@
                     <v-btn v-if="sonoProntoBtn" class="ma-3" color="#718F94" style="color: white;" @click="sonoPronto()">Sono
                     pronto
                     </v-btn>
-                    <v-btn v-if="sommaPunti < 3" class="ma-3" color="#718F94" style="color: white" @click="aMonte">a
-                        monte
-                    </v-btn>
                     <div v-if="toccaAMe">
                         <v-btn color="#718F94" class="ma-3" style="color: white" @click="giocaCarta">Giocala</v-btn>
                         <!--v-btn class="ma-3" color="#718F94" style="color: white" @click="tuttoNostro">Tutto nostro</v-btn-->
@@ -60,6 +57,22 @@
         </v-row>
 
         <v-dialog
+                v-model="aMonteDialog"
+                width="400"
+                persistent
+        >
+            <v-card style="text-align: center; background-color: #90B494">
+                <v-card-title class="headline lighten-2" style="background-color: #DBCFB0">
+                    A Monte!
+                </v-card-title>
+
+                <v-card-text class="mt-4">
+                    <b>{{nomeGiocatoreAMonte}} ha mandato a monte!</b>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog
                 v-model="chiamaDialog"
                 width="400"
                 persistent
@@ -74,7 +87,7 @@
                 </v-card-title>
                 <v-card-text style="text-align: center; background-color: #90B494">
                     <div v-if="chiamante === ''">
-                        <v-btn class="ma-3" v-for="val in chiamabili" :disabled="!toccaAMe" :key="val"
+                        <v-btn class="ma-3" v-for="val in chiamabili" :disabled="!toccaAMe" :key="val" :style="getStyleChiamabili(val)"
                                @click="chiamaCarta(val, puntiChiamati)">
                             {{getValoreCarta(val)}}
                         </v-btn>
@@ -226,7 +239,9 @@
             logMessages: [],
             carteChiamate:[],
             logChat: [],
-            abilitaChat: false
+            abilitaChat: false,
+            nomeGiocatoreAMonte: '',
+            aMonteDialog: false
         }),
         mounted() {
             this.me = this.$store.state.giocatore.id
@@ -296,6 +311,9 @@
                         case "showMessaggioChat":
                             this.showMessaggioChat(messaggio)
                             break
+                        case "aMonte":
+                            this.aMonte(messaggio)
+                            break
                     }
                 }
             },
@@ -324,7 +342,9 @@
                 this.puntiDiOggi = {},
                 this.mano = undefined,
                 this.logMessages = [],
-                this.carteChiamate = []
+                this.carteChiamate = [],
+                this.nomeGiocatoreAMonte = '',
+                this.aMonteDialog = false
             },
             iniziaPartita(resp) {
                 this.clearVariabili()
@@ -345,6 +365,10 @@
                     this.puntiChiamati = resp.PuntiVittoria + 1
                 }
                 this.chiamabili.push("passo")
+                if(this.sommaPunti < 3){
+                    this.chiamabili.push("a monte");
+                }
+
                 this.valChiamato = resp.ValChiamato
                 this.chiamanteProvvisorio = resp.ChiamanteProvvisorio
 
@@ -389,8 +413,8 @@
             giraCarte() {
                 this.showCarteGirate = true
             },
-            iniziaAltroRound() {
-                this.mandaMessaggio('altroRound')
+            iniziaAltroRound(aMonte = false) {
+                this.mandaMessaggio('altroRound', [aMonte.toString()])
             },
             finePartita(resp) {
                 this.giocatori = resp.Giocatori
@@ -629,8 +653,20 @@
                     this.$forceUpdate()
                 }
             },
-            aMonte(){
-                
+            aMonte(resp){
+                this.nomeGiocatoreAMonte = this.getNomeGiocatore(resp.Giocatore);
+                this.aMonteDialog = true;
+                this.chiamaDialog = false;
+                setTimeout(() => {
+                    this.iniziaAltroRound(true);
+                }, 5000);
+            },
+            getStyleChiamabili(val){
+                let style = "";
+                if(val === "a monte" || val === "passo") {
+                    style = "background-color: #4454e3; color: white";
+                }
+                return style;
             },
             tuttoNostro() {
 

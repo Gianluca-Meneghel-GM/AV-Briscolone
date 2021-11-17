@@ -50,6 +50,9 @@ func chiamaValoreHandler(mex messaggioDaClient) {
 		if len(inChiamata) == 1 {
 			partita.SetChiamante(inChiamata[0])
 		}
+	} else if valoreStr == "a monte" {
+		broadcast(aMonteResp{Azione: "aMonte", Giocatore: giocatore})
+		return
 	} else {
 		chiamanteProvvisorio = giocatore
 		partita.SetChiamanteProvvisorio(giocatore)
@@ -135,7 +138,8 @@ func iniziaManoHandler() {
 }
 
 func altroRoundHandler(mex messaggioDaClient) {
-	if mex.Mittente == 0 {
+	aMonte := mex.Params[0] == "true"
+	if aMonte || mex.Mittente == 0 {
 		partita.ResetRound()
 	}
 	for i := 0; i < 5; i++ {

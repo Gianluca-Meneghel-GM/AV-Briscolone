@@ -61,6 +61,11 @@ type messaggioChatResp struct {
 	Messaggio string
 }
 
+type aMonteResp struct {
+	Azione    string
+	Giocatore int
+}
+
 func setResponse(w http.ResponseWriter, body interface{}, statusCode int) {
 	if statusCode != http.StatusOK {
 		w.WriteHeader(statusCode)
