@@ -5,7 +5,7 @@
             <div v-for="(carta,i) in carte" :key="i">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on, attrs }">
-                        <v-img :class="{transform: selectedCarta === carta}"
+                        <v-img :class="{selezionata: selectedCarta === carta}"
                             :style="getStyleCarta(carta)"
                             contain
                             :src="getSpriteCartaGiocatore(carta)"
@@ -73,7 +73,7 @@ export default {
 
 <style scoped>
 
-.transform {
+.selezionata {
   animation: slide-scale 0.2s ease-in forwards;
 }
 
@@ -83,11 +83,11 @@ export default {
   }
 
   70% {
-    transform: translateY(-15px) scale(1.05);
+    transform: translateY(-15px) scale(1.1);
   }
 
   100% {
-    transform: translateY(-25px) scale(1.1);
+    transform: translateY(-25px) scale(1.2);
   }
   
 }
