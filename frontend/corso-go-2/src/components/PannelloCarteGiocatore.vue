@@ -59,7 +59,7 @@ export default {
         getStyleCarta(carta) {
             let border = "border: ;"
             if (carta.isSelected) {
-                border += "border: 3px solid #24ccf2;"
+                border += "border: 3px solid #24ccf2; z-index: 100;"
             }
             return "width: 8.5vh; margin-top: 50px; margin-left: 2px; margin-right: 2px; margin-bottom: 5px; border-radius: 3%; box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.2), 10px 10px 20px 0 rgba(0, 0, 0, 0.19); cursor: pointer;" + border
         },

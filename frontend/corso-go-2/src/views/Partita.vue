@@ -48,11 +48,17 @@
                         </section>
                     </v-flex>
                     <pannello-carte-giocatore ref="box0" :carte="carte" :toccaA="toccaA" :chiamante="chiamante" :selectedCarta="selectedCarta" @cartaSelected="cartaSelected"></pannello-carte-giocatore>
-                    <informazioni-chiamante :showCartaSocio="showCartaSocio" :cartaChiamata="cartaChiamata" :puntiVittoria="puntiVittoria" :chiamante="getNomeGiocatore(chiamante)"></informazioni-chiamante>
+                    <informazioni-chiamante :timerVisible="roundIniziato && toccaAMe" 
+                                            :showCartaSocio="showCartaSocio" 
+                                            :cartaChiamata="cartaChiamata" 
+                                            :puntiVittoria="puntiVittoria" 
+                                            :chiamante="getNomeGiocatore(chiamante)"
+                                            @timesUp="timesUp">
+                    </informazioni-chiamante>
                 </v-layout>
             </v-col>
             <v-col md="2">
-                <the-chat :enabled="abilitaChat" :myName="getNomeGiocatore(me)" :logChat="logChat" @mandaMessaggioChat="mandaMessaggioChat"></the-chat>
+                <the-chat :enabled="roundIniziato" :myName="getNomeGiocatore(me)" :logChat="logChat" @mandaMessaggioChat="mandaMessaggioChat"></the-chat>
             </v-col>
         </v-row>
 
@@ -239,7 +245,7 @@
             logMessages: [],
             carteChiamate:[],
             logChat: [],
-            abilitaChat: false,
+            roundIniziato: false,
             nomeGiocatoreAMonte: '',
             aMonteDialog: false
         }),
@@ -352,7 +358,7 @@
                 this.$store.dispatch('setGiocatori', resp.CurrentGiocatori)
                 this.setTurno(resp.ToccaA)
                 this.chiamaDialog = true
-                this.abilitaChat = true
+                this.roundIniziato = false;
             },
             setChiamabili(resp) {
                 this.showChiamaAPuntiBox = false
@@ -403,6 +409,7 @@
                 }
             },
             iniziaRound(resp) {
+                this.roundIniziato = true
                 this.chiamaDialog = false
                 this.setTurno(resp.ToccaA)
                 this.briscola = resp.Briscola
@@ -631,6 +638,13 @@
             },
             getPrese(pos) {
                 return this.$store.getters.getPrese(pos);
+            },
+            timesUp() {
+                if(this.selectedCarta && Object.keys(this.selectedCarta).length === 0 && Object.getPrototypeOf(this.selectedCarta) === Object.prototype) {
+                    const index = Math.floor(Math.random() * this.carte.length);
+                    this.cartaSelected(this.carte[index])
+                }
+                this.giocaCarta();
             },
             giocaCarta() {
                 if (this.toccaAMe && this.selectedCarta.Valore !== 0) {
