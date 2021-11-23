@@ -49,7 +49,8 @@
     },
     data: () => ({
       selectedMazzo: 'brescia',
-      mazzi: ['Brescia', 'Bergamo', 'Milano', 'Napoli', 'Alpini']
+      //'Bergamo', 'Milano' temporaneamente rimosse in attesa di nuove sprite
+      mazzi: ['Brescia', 'Napoli', 'Jacovitti']
     }),
     computed: {
       header () {
