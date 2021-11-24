@@ -109,7 +109,7 @@
                     <v-layout v-else-if="showSemi">
                         <v-flex xs6>
                             <v-btn @click="chiamaSeme('B')" class="ma-3">Bastù</v-btn>
-                            <v-btn @click="chiamaSeme('D')" class="ma-3">Den Arrow</v-btn>
+                            <v-btn @click="chiamaSeme('D')" class="ma-3">Soldi</v-btn>
                         </v-flex>
                         <v-flex xs6>
                             <v-btn @click="chiamaSeme('C')" class="ma-3">Cope</v-btn>

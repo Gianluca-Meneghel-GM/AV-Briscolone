@@ -23,6 +23,9 @@
                     :key="index"
                     @click="setMazzo(mazzo)"
             >
+              <v-list-item-avatar tile style="height: 50px; width: 30px; min-width: 25px">
+                <v-img :src="require(`./assets/${mazzo.toLowerCase()}/21D.png`)"></v-img>
+              </v-list-item-avatar>
               <v-list-item-title>{{ mazzo }}</v-list-item-title>
             </v-list-item>
           </v-list>
