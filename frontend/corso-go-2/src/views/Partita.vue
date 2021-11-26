@@ -1,23 +1,26 @@
 <template>
     <div class="text-center ma-n3 pa-0" style="background-color: #BFC8AD">
-        <v-dialog
-                v-model="notYetDialog"
-                width="500"
-        >
-            <v-card style="text-align: center; background-color: #90B494">
-                <v-card-title class="headline lighten-2" style="background-color: #DBCFB0">
-                    Attendere prego...
-                </v-card-title>
-
-                <v-card-text class="mt-4">
-                    Mancano ancora {{missingPlayers}} giocatori
-                </v-card-text>
-                <v-card-actions v-if="me === 0">
-                    <v-spacer/>
-                    <v-btn @click="mandaMessaggio('addBots')">Gioca coi bot</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
+        
+        <im-ready-dialog :me="me" :notYetDialog="notYetDialog" :missingPlayers="missingPlayers" @addBots="addBots"></im-ready-dialog>
+        <a-monte-dialog :aMonteDialog="aMonteDialog" :nomeGiocatoreAMonte="nomeGiocatoreAMonte"></a-monte-dialog>
+        <chiama-carta-dialog :chiamaDialog="chiamaDialog"
+                             :valChiamato="valChiamato"
+                             :chiamanteProvvisorio="chiamanteProvvisorio"
+                             :chiamante="chiamante"
+                             :chiamabili="chiamabili"
+                             :toccaAMe="toccaAMe"
+                             :puntiChiamati="puntiChiamati"
+                             :showChiamaAPuntiBox="showChiamaAPuntiBox"
+                             :showSemi="showSemi"
+                             @cartaChiamata="chiamaCarta"
+                             @chiamaSeme="chiamaSeme"
+                             >
+        </chiama-carta-dialog>
+        <statistiche-dialog :vittoriaDialog="vittoriaDialog" :showPunteggiTotali="showPunteggiTotali" 
+                            :datiVittoria="datiVittoria" :giocatori="giocatori" :me="me" :puntiDiOggi="puntiDiOggi"
+                            @iniziaAltroRound="iniziaAltroRound"
+                            @bastaCosi="bastaCosi">
+        </statistiche-dialog>
 
         <v-row class="board">
             <v-col md="10">
@@ -61,133 +64,6 @@
                 <the-chat :enabled="roundIniziato" :myName="getNomeGiocatore(me)" :logChat="logChat" @mandaMessaggioChat="mandaMessaggioChat"></the-chat>
             </v-col>
         </v-row>
-
-        <v-dialog
-                v-model="aMonteDialog"
-                width="400"
-                persistent
-        >
-            <v-card style="text-align: center; background-color: #90B494">
-                <v-card-title class="headline lighten-2" style="background-color: #DBCFB0">
-                    A Monte!
-                </v-card-title>
-
-                <v-card-text class="mt-4">
-                    <b>{{nomeGiocatoreAMonte}} ha mandato a monte!</b>
-                </v-card-text>
-            </v-card>
-        </v-dialog>
-
-        <v-dialog
-                v-model="chiamaDialog"
-                width="400"
-                persistent
-        >
-            <v-card>
-                <v-card-title class="headline lighten-2 pa-3" style="background-color: #DBCFB0">
-                    <b>Fase di Chiamata</b>
-                    <v-spacer/>
-                    <div v-if="getValoreCarta(valChiamato) !== 'niente'" class="ma-3"> 
-                        <b style="color: #4454e3">{{getNomeGiocatore(chiamanteProvvisorio)}}</b> ha chiamato: <b style="color: #4454e3">{{getValoreCarta(valChiamato)}}</b>
-                    </div>
-                </v-card-title>
-                <v-card-text style="text-align: center; background-color: #90B494">
-                    <div v-if="chiamante === ''">
-                        <v-btn class="ma-3" v-for="val in chiamabili" :disabled="!toccaAMe" :key="val" :style="getStyleChiamabili(val)"
-                               @click="chiamaCarta(val, puntiChiamati)">
-                            {{getValoreCarta(val)}}
-                        </v-btn>
-                        <div v-if="showChiamaAPuntiBox" style="text-align: -webkit-center">
-                            <v-text-field label="chiama a punti" type="number" :min="puntiChiamati"
-                                          :readonly="!toccaAMe"
-                                          v-model="puntiChiamati" style="width: 90px; text-align-last: center"/>
-                            <v-btn v-if="toccaAMe"
-                                   @click="mandaMessaggio('chiamaValore', ['2', puntiChiamati.toString()])">Chiama
-                            </v-btn>
-                        </div>
-                    </div>
-                    <v-layout v-else-if="showSemi">
-                        <v-flex xs6>
-                            <v-btn @click="chiamaSeme('B')" class="ma-3">Bastù</v-btn>
-                            <v-btn @click="chiamaSeme('D')" class="ma-3">Soldi</v-btn>
-                        </v-flex>
-                        <v-flex xs6>
-                            <v-btn @click="chiamaSeme('C')" class="ma-3">Cope</v-btn>
-                            <v-btn @click="chiamaSeme('S')" class="ma-3">Spade</v-btn>
-                        </v-flex>
-                    </v-layout>
-                    <div v-else>Chiama {{getNomeGiocatore(chiamante)}}</div>
-                </v-card-text>
-            </v-card>
-        </v-dialog>
-        <v-dialog
-                v-model="vittoriaDialog"
-                :width="getLarghezzaDialogVittoria()"
-                persistent
-        >
-            <v-card>
-                <v-card-title class="headline lighten-2" style="background-color: #DBCFB0">
-                    Finita
-                </v-card-title>
-                <v-card-text style="text-align: center; background-color: #90B494">
-                    <div class="pa-3" style="font-size: 1.3em; font-weight: bold">
-                        Han vinto <b style="color: #4454e3">{{getVincitoriStr(datiVittoria.Vincitori)}}</b> <b style="color: #064723">{{datiVittoria.PuntiVincitori}}</b> a <b style="color: #a01118">{{120 -
-                        datiVittoria.PuntiVincitori}}</b>
-                    </div>
-                    <v-simple-table v-if="!showPunteggiTotali" style="background-color: #DBCFB0">
-                        <template v-slot:default>
-                            <thead>
-                            <tr>
-                                <th class="text-center" style="font-size: 1.1em">Nome</th>
-                                <th class="text-center" style="font-size: 1.1em">Punti</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="(punti,i) in datiVittoria.PuntiPartita" :key="i">
-                                <td>{{ getNomeGiocatore(i) }}</td>
-                                <td>{{ punti }}</td>
-                            </tr>
-                            </tbody>
-                        </template>
-                    </v-simple-table>
-                    <v-simple-table v-else style="background-color: #DBCFB0">
-                        <template v-slot:default>
-                            <thead>
-                            <tr>
-                                <th class="text-center" style="font-size: 1.1em">Nome</th>
-                                <th class="text-center" style="font-size: 1.1em">Giornate</th>
-                                <th class="text-center" style="font-size: 1.1em">Vittorie</th>
-                                <th class="text-center" style="font-size: 1.1em">% Vittorie</th>
-                                <th class="text-center" style="font-size: 1.1em">Punti totali</th>
-                                <th class="text-center" style="font-size: 1.1em">Punti/giornata</th>
-                                <th class="text-center" style="font-size: 1.1em">Partite</th>
-                                <th class="text-center" style="font-size: 1.1em">Punti/partita</th>
-                                <th class="text-center" style="font-size: 1.1em">Punti di oggi</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="g in giocatori" :key="g.Nome">
-                                <td>{{g.Nome}}</td>
-                                <td>{{g.Partite}}</td>
-                                <td>{{g.Vittorie}}</td>
-                                <td>{{Math.round(g.Vittorie/g.Partite*100)}}%</td>
-                                <td>{{g.PuntiTot}}</td>
-                                <td>{{Math.round(g.PuntiTot/g.Partite*100)/100}}</td>
-                                <td>{{g.Round}}</td>
-                                <td>{{Math.round(g.PuntiTot/g.Round*100)/100}}</td>
-                                <td>{{puntiDiOggi[g.Nome]}}</td>
-                            </tr>
-                            </tbody>
-                        </template>
-                    </v-simple-table>
-                </v-card-text>
-                <v-card-actions style="text-align: center; background-color: #90B494">
-                    <v-spacer/>
-                    <v-btn v-if="me === 0" @click="iniziaAltroRound()">GG, un'altra</v-btn>
-                    <v-btn v-if="me === 0" @click="mandaMessaggio('bastaCosì')">GG, basta così</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
     </div>
 </template>
 
@@ -199,6 +75,10 @@
     import TheLogs from '../components/TheLogs.vue'
     import PannelloCarteGiocatore from "../components/PannelloCarteGiocatore.vue";
     import InformazioniChiamante from "../components/InformazioniChiamante.vue";
+    import ImReadyDialog from '../components/dialogs/ImReadyDialog.vue'
+    import AMonteDialog from'../components/dialogs/AMonteDialog.vue'
+    import ChiamaCartaDialog from'../components/dialogs/ChiamaCartaDialog.vue'
+    import StatisticheDialog from'../components/dialogs/StatisticheDialog.vue'
 
     export default {
         name: "Partita",
@@ -208,7 +88,11 @@
             TheChat,
             TheLogs,
             PannelloCarteGiocatore,
-            InformazioniChiamante
+            InformazioniChiamante,
+            ImReadyDialog,
+            AMonteDialog,
+            ChiamaCartaDialog,
+            StatisticheDialog
         },
         data: () => ({
             ws: {},
@@ -417,11 +301,17 @@
                     this.giocaCartaBot(this.toccaA)
                 }
             },
+            addBots(){
+                this.mandaMessaggio('addBots')
+            },
             giraCarte() {
                 this.showCarteGirate = true
             },
             iniziaAltroRound(aMonte = false) {
                 this.mandaMessaggio('altroRound', [aMonte.toString()])
+            },
+            bastaCosi(){
+                this.mandaMessaggio('bastaCosì');
             },
             finePartita(resp) {
                 this.giocatori = resp.Giocatori
@@ -675,13 +565,6 @@
                     this.iniziaAltroRound(true);
                 }, 5000);
             },
-            getStyleChiamabili(val){
-                let style = "";
-                if(val === "a monte" || val === "passo") {
-                    style = "background-color: #4454e3; color: white";
-                }
-                return style;
-            },
             tuttoNostro() {
 
             },
@@ -696,7 +579,7 @@
             },
             mandaMessaggioBot(id) {
                 this.mandaMessaggio("giocaCartaBot", [id.toString()])
-            },
+                            },
             getVincitoriStr(vinc) {
                 if (!vinc)
                     return ''
