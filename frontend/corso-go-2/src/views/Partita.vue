@@ -579,21 +579,6 @@
             },
             mandaMessaggioBot(id) {
                 this.mandaMessaggio("giocaCartaBot", [id.toString()])
-                            },
-            getVincitoriStr(vinc) {
-                if (!vinc)
-                    return ''
-                let vincitori = ''
-                for (let i = 0; i < vinc.length; i++) {
-                    vincitori += this.getNomeGiocatore(vinc[i]) + ', '
-                }
-                return vincitori
-            },
-            getLarghezzaDialogVittoria() {
-                if (this.showPunteggiTotali) {
-                    return 900
-                }
-                return 400
             }
         }
     }
